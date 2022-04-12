@@ -26,4 +26,5 @@ message request
 	string         background_image            = 18;
 
 	bool           debug                       = 19;
+	bool           terminate                   = 20;
 }

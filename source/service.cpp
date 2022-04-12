@@ -28,7 +28,7 @@ std::int32_t service::run(std::int32_t argc, char** argv)
   ::request request;
   ::image   image  ;
 
-  while (true)
+  while (!request.terminate())
   {
     if (communicator.rank() == 0)
     {
@@ -37,7 +37,7 @@ std::int32_t service::run(std::int32_t argc, char** argv)
       request.ParseFromArray(received.data(), static_cast<std::int32_t>(received.size()));
     }
 
-    // TODO: Create the image based on the request. Propagate the request to other ranks.
+    // TODO: Propagate the request to other ranks and render the image.
 
     if (communicator.rank() == 0)
     {

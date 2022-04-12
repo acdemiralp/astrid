@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+message ivec2
+{
+	int32 x = 1;
+	int32 y = 2;
+}
+
+message image 
+{
+	ivec2 size = 1;
+	bytes data = 2;
+}

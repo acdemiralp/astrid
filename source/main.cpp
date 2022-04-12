@@ -1,4 +1,8 @@
-int main(int argc, char** argv)
+#include <cstdint>
+
+#include <astrid/service.hpp>
+
+std::int32_t main(const std::int32_t argc, char** argv)
 {
-  return 0;
+  return ast::service(argc, argv).run();
 }

@@ -7,7 +7,8 @@ cd vcpkg
 if not exist "vcpkg.exe" call bootstrap-vcpkg.bat
 
 set VCPKG_DEFAULT_TRIPLET=x64-windows
-vcpkg install --recurse --overlay-ports=../../vcpkg/overlay_ports doctest qt5-base zeromq
+vcpkg install --recurse protobuf zeromq
+vcpkg install --recurse --overlay-ports=../../vcpkg/overlay_ports doctest eigen3 ffmpeg tbb thrust
 cd ..
 
 cmake -Ax64 -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake ..

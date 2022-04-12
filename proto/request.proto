@@ -1,7 +1,29 @@
 syntax = "proto3";
 
-message vec3
+import "basic_types.proto";
+
+message request 
 {
-	float x = 1;
-	float y = 2;
+	string         metric_type                 = 1;
+	repeated float metric_parameters           = 2;
+	string         tableau_type                = 3;
+	string         error_controller_type       = 4;
+	repeated float error_controller_parameters = 5;
+
+	ivec2          image_size                  = 6;
+	uint64         iterations                  = 7;
+	float          lambda_step_size            = 8;
+	float          lambda                      = 9;
+	fvec4          lower_bound                 = 10;
+	fvec4          upper_bound                 = 11;
+	
+	float          coordinate_time             = 12;
+	fvec3          position                    = 13;
+	fvec3          rotation                    = 14;
+	bool           look_at_origin              = 15;
+	string         projection_type             = 16;
+	repeated float projection_parameters       = 17;
+	string         background_image            = 18;
+
+	bool           debug                       = 19;
 }

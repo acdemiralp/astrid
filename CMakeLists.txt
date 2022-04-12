@@ -31,6 +31,9 @@ list        (APPEND PROJECT_LIBRARIES protobuf::libprotoc protobuf::libprotobuf)
 find_package(ZeroMQ CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES libzmq)
 
+find_package(cppzmq CONFIG REQUIRED)
+list        (APPEND PROJECT_LIBRARIES cppzmq)
+
 ##################################################    Targets     ##################################################
 add_executable(${PROJECT_NAME} ${PROJECT_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC 
@@ -43,7 +46,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_COMPILE_DEFINITIONS}
 set_target_properties     (${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 ##################################################   Prebuild     ##################################################
-protobuf_generate(LANGUAGE cpp TARGET ${PROJECT_NAME} PROTOS ${PROJECT_PROTOS})
+protobuf_generate(LANGUAGE cpp TARGET ${PROJECT_NAME} PROTOS ${PROJECT_PROTOS} IMPORT_DIRS proto)
 
 ##################################################  Installation  ##################################################
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}-config RUNTIME DESTINATION bin)

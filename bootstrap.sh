@@ -8,7 +8,6 @@ if [ ! -f "vcpkg" ] ; then ./bootstrap-vcpkg.sh ; fi
 
 VCPKG_DEFAULT_TRIPLET=x64-linux
 vcpkg install --recurse protobuf zeromq
-vcpkg install --recurse --overlay-ports=../../vcpkg/overlay_ports doctest eigen3 ffmpeg tbb thrust
 cd ..
 
 cmake -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake ..

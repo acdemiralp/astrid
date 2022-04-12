@@ -1,7 +1,0 @@
-{
-  "name"          : "thrust",
-  "version-string": "1.15.0",
-  "port-version"  : 1,
-  "description"   : "The C++ parallel algorithms library.",
-  "homepage"      : "https://github.com/thrust/thrust"
-}

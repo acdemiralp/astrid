@@ -8,14 +8,6 @@ set                   (CMAKE_CXX_STANDARD 17)
 include               (set_max_warning_level)
 set_max_warning_level ()
 
-##################################################    Options     ##################################################
-option      (ASTRID_BUILD_APPLICATIONS "Build the example applications (default: OFF)."  OFF)
-option      (ASTRID_USE_FFMPEG         "Use FFMPEG for video output (default: OFF)."     OFF)
-option      (ASTRID_USE_MPI            "Use MPI for distributed compute (default: OFF)." OFF)
-
-set         (ASTRAY_DEVICE_SYSTEM OMP CACHE STRING "Device system (default: OMP).")
-set_property(CACHE ASTRAY_DEVICE_SYSTEM PROPERTY STRINGS CPP CUDA OMP TBB)
-
 ##################################################    Sources     ##################################################
 file(GLOB_RECURSE PROJECT_HEADERS include/*.h include/*.hpp)
 file(GLOB_RECURSE PROJECT_SOURCES source/*.c source/*.cpp)
@@ -29,11 +21,6 @@ assign_source_group(${PROJECT_FILES})
 
 ##################################################  Dependencies  ##################################################
 include(import_library)
-
-find_package(doctest CONFIG REQUIRED)
-find_package(Eigen3 REQUIRED NO_MODULE)
-find_package(thrust CONFIG REQUIRED)
-find_package(MPI REQUIRED COMPONENTS C)
 
 find_package(astray CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES astray)

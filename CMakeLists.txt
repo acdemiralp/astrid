@@ -25,14 +25,19 @@ include(import_library)
 find_package(astray CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES astray)
 
+find_package(cppzmq CONFIG REQUIRED)
+list        (APPEND PROJECT_LIBRARIES cppzmq)
+
 find_package(Protobuf CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES protobuf::libprotoc protobuf::libprotobuf)
 
+set         (CMAKE_AUTOMOC ON)
+set         (CMAKE_AUTOUIC ON)
+find_package(Qt5Widgets REQUIRED)
+list        (APPEND PROJECT_LIBRARIES Qt5::Widgets)
+
 find_package(ZeroMQ CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES libzmq)
-
-find_package(cppzmq CONFIG REQUIRED)
-list        (APPEND PROJECT_LIBRARIES cppzmq)
 
 enable_language(CUDA)
 

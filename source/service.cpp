@@ -41,13 +41,12 @@ std::int32_t service::run(std::int32_t argc, char** argv)
       std::copy_n(static_cast<std::uint8_t*>(message.data()), message.size(), data.begin());
     }
     
-    communicator.bcast(&size      , 1   , mpi::data_type(MPI_INT ));
-    data.resize(size);
-    communicator.bcast(data.data(), size, mpi::data_type(MPI_BYTE));
-    request.ParseFromArray(data.data(), static_cast<std::int32_t>(data.size()));
+    communicator.bcast         (&size      , 1   , mpi::data_type(MPI_INT ));
+    data        .resize        (size);
+    communicator.bcast         (data.data(), size, mpi::data_type(MPI_BYTE));
+    request     .ParseFromArray(data.data(), static_cast<std::int32_t>(data.size()));
     
-    // TODO: Render the image according to the request.
-    image<float> result;
+    image<float> result; // TODO: Render the image according to the request.
 
     if (communicator.rank() == 0)
     {

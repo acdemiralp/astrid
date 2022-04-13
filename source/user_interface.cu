@@ -1,30 +1,17 @@
 #include <astrid/user_interface.hpp>
 
 #include <QApplication>
-#include <QMainWindow>
-#include <QSurfaceFormat>
 
 #include <astrid/window.hpp>
 
 namespace ast
 {
-std::int32_t user_interface::run(std::int32_t argc, char** argv, const cxxopts::ParseResult& options)
+std::int32_t user_interface::run(std::int32_t argc, char** argv)
 {
-  QSurfaceFormat format;
-  format.setProfile     (QSurfaceFormat::CompatibilityProfile);
-  format.setSwapBehavior(QSurfaceFormat::DoubleBuffer        );
-  format.setSamples     (4);
-  format.setVersion     (4, 5);
-  QSurfaceFormat::setDefaultFormat(format);
-
   QApplication application(argc, argv);
 
-  //window window;
-  //window.setWindowTitle("Astrid");
-  //window.resize        (640, 480);
-  //window.show          ();
-
-  // TODO
+  window window;
+  window.show();
 
   return application.exec();
 }

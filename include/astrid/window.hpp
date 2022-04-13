@@ -1,19 +1,18 @@
 #pragma once
 
+#include <memory>
+
 #include <QMainWindow>
 
-//QT_BEGIN_NAMESPACE
-//namespace Ui { class main_window; }
-//QT_END_NAMESPACE
-//
-//class window : public QMainWindow
-//{
-//  Q_OBJECT
-//
-//public:
-//  window(QWidget* parent = nullptr);
-// ~window();
-//
-//private:
-//  Ui::main_window* ui;
-//};
+#include <ui_main_window.h>
+
+class window : public QMainWindow
+{
+  Q_OBJECT
+
+public:
+  explicit window(QWidget* parent = nullptr);
+
+private:
+  std::unique_ptr<Ui::main_window> ui_;
+};

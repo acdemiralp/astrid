@@ -15,7 +15,13 @@ file(GLOB_RECURSE PROJECT_PROTOS proto/*.proto)
 file(GLOB_RECURSE PROJECT_UIS ui/*.ui)
 file(GLOB_RECURSE PROJECT_CMAKE_UTILS cmake/*.cmake)
 file(GLOB_RECURSE PROJECT_MISC *.md *.txt)
-set (PROJECT_FILES ${PROJECT_HEADERS} ${PROJECT_SOURCES} ${PROJECT_PROTOS} ${PROJECT_CMAKE_UTILS} ${PROJECT_MISC})
+set (PROJECT_FILES 
+  ${PROJECT_HEADERS} 
+  ${PROJECT_SOURCES} 
+  ${PROJECT_PROTOS} 
+  ${PROJECT_UIS} 
+  ${PROJECT_CMAKE_UTILS} 
+  ${PROJECT_MISC})
 
 include            (assign_source_group)
 assign_source_group(${PROJECT_FILES})
@@ -37,10 +43,10 @@ list        (APPEND PROJECT_LIBRARIES protobuf::libprotoc protobuf::libprotobuf)
 
 find_package(Qt5Widgets REQUIRED)
 list        (APPEND PROJECT_LIBRARIES Qt5::Widgets)
+qt5_wrap_ui (PROJECT_GENERATED_UIS ${PROJECT_UIS})
+list        (APPEND PROJECT_FILES ${PROJECT_GENERATED_UIS})
 set         (CMAKE_AUTOMOC ON)
 set         (CMAKE_AUTORCC ON)
-set         (CMAKE_AUTOUIC ON)
-qt5_wrap_ui (PROJECT_UI_HEADERS ${PROJECT_UIS})
 
 find_package(ZeroMQ CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES libzmq)

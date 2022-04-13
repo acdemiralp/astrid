@@ -13,15 +13,6 @@ std::int32_t main(const std::int32_t argc, char** argv)
     ("p,port"  , "Server port."              , cxxopts::value<std::int32_t>()->default_value("3000" ));
   const auto options = configuration.parse(argc, argv);
 
-  if (options.count("server"))
-  {
-    ast::service service(options);
-    service.run();
-  }
-  else
-  {
-    ast::user_interface::run(argc, argv, options);
-  }
-
+  options.count("server") ? ast::service(options).run() : ast::user_interface::run(argc, argv);
   return 0;
 }

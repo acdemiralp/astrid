@@ -5,15 +5,15 @@ import "basic_types.proto";
 message request 
 {
 	string         metric_type                 = 1;
-	repeated float metric_parameters           = 2;
-	string         tableau_type                = 3;
-	string         error_controller_type       = 4;
-	repeated float error_controller_parameters = 5;
+	repeated float metric_parameters           = 2;  // Not implemented.
+	string         tableau_type                = 3;  // Not implemented.
+	string         error_controller_type       = 4;  // Not implemented.
+	repeated float error_controller_parameters = 5;  // Not implemented.
 
-	ivec2          image_size                  = 6;
-	uint64         iterations                  = 7;
-	float          lambda_step_size            = 8;
-	float          lambda                      = 9;
+	ivec2          image_size                  = 6; 
+	uint64         iterations                  = 7; 
+	float          lambda_step_size            = 8; 
+	float          lambda                      = 9; 
 	fvec4          lower_bound                 = 10;
 	fvec4          upper_bound                 = 11;
 	
@@ -22,9 +22,13 @@ message request
 	fvec3          rotation                    = 14;
 	bool           look_at_origin              = 15;
 	string         projection_type             = 16;
-	repeated float projection_parameters       = 17;
-	string         background_image            = 18;
+	float          projection_fov_y            = 17;
+	float          projection_focal_length     = 18;
+	float          projection_height           = 19;
+	float          projection_near_clip        = 20;
+	float          projection_far_clip         = 21;
+	string         background_image            = 22;
 
-	bool           debug                       = 19;
-	bool           terminate                   = 20;
+	bool           debug                       = 23;
+	bool           terminate                   = 24;
 }

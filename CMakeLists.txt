@@ -10,7 +10,7 @@ set_max_warning_level ()
 
 ##################################################    Sources     ##################################################
 file(GLOB_RECURSE PROJECT_HEADERS include/*.h include/*.hpp)
-file(GLOB_RECURSE PROJECT_SOURCES source/*.c source/*.cpp)
+file(GLOB_RECURSE PROJECT_SOURCES source/*.c source/*.cpp source/*.cu)
 file(GLOB_RECURSE PROJECT_PROTOS proto/*.proto)
 file(GLOB_RECURSE PROJECT_CMAKE_UTILS cmake/*.cmake)
 file(GLOB_RECURSE PROJECT_MISC *.md *.txt)
@@ -33,6 +33,8 @@ list        (APPEND PROJECT_LIBRARIES libzmq)
 
 find_package(cppzmq CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES cppzmq)
+
+enable_language(CUDA)
 
 ##################################################    Targets     ##################################################
 add_executable(${PROJECT_NAME} ${PROJECT_FILES})

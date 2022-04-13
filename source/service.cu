@@ -21,11 +21,11 @@ service::service(const cxxopts::ParseResult& options)
 
 void service::run      ()
 {
-  request                      request     ;
-  ::image                      response    ;
-  std::int32_t                 message_size;
-  std::vector<std::uint8_t>    message_data;
-  image_type                   image       ;
+  request                   request     ;
+  ::image                   response    ;
+  std::int32_t              message_size;
+  std::vector<std::uint8_t> message_data;
+  image_type                image       ;
 
   while (!request.terminate())
   {
@@ -64,53 +64,115 @@ void service::run      ()
 
 void service::configure(const request& request)
 {
-  //if      (request.metric_type() == "minkowski")
-  //  ray_tracer_ = make_ray_tracer<scalar_type, metrics::goedel         <scalar_type>>(request);
-  //else if (request.metric_type() == "goedel")
-  //  ray_tracer_ = make_ray_tracer<float, metrics::goedel         <float>>(request);
-  //else if (request.metric_type() == "schwarzschild")
-  //  make_ray_tracer<float, metrics::schwarzschild  <float>>(request);
-  //else if (request.metric_type() == "kerr")
-  //  make_ray_tracer<float, metrics::kerr           <float>>(request);
-  //else if (request.metric_type() == "kastor_traschen")
-  //  make_ray_tracer<float, metrics::kastor_traschen<float>>(request);
-  
-  //auto ray_tracer = ast::ray_tracer<metric_type, motion_type>(
-  //  vector2<std::int32_t>   (request.image_size().x(), request.image_size().y()),
-  //  metric_type             (),
-  //  request.iterations      (),
-  //  request.lambda_step_size(),
-  //  request.lambda          (),
-  //  aabb4<scalar_type>(
-  //    vector4<scalar_type>(request.lower_bound().t(), request.lower_bound().x(), request.lower_bound().y(), request.lower_bound().z()),
-  //    vector4<scalar_type>(request.upper_bound().t(), request.upper_bound().x(), request.upper_bound().y(), request.upper_bound().z())),
-  //  typename motion_type::error_evaluator_type(),
-  //  request.debug           ());
-  //
-  //ray_tracer->observer.coordinate_time             = request.coordinate_time();
-  //ray_tracer->observer.transform.translation       = {request.position().x(), request.position().y(), request.position().z()};
-  //ray_tracer->observer.transform.rotation_from_euler({request.rotation().x(), request.rotation().y(), request.rotation().z()});
-  //if (request.look_at_origin())
-  //  ray_tracer->observer.transform.look_at({0, 0, 0});
-  //
-  //if      (request.projection_type() == "perspective")
-  //  ray_tracer->observer.projection = perspective_projection<scalar_type>
-  //  {
-  //    request.projection_fov_y       (),
-  //    static_cast<scalar_type>(request.image_size().x()) / request.image_size().y(),
-  //    request.projection_focal_length(),
-  //    request.projection_near_clip   (),
-  //    request.projection_far_clip    ()
-  //  };
-  //else if (request.projection_type() == "orthographic")
-  //  ray_tracer->observer.projection = orthographic_projection<scalar_type>
-  //  {
-  //    request.projection_height     (),
-  //    static_cast<scalar_type>(request.image_size().x()) / request.image_size().y(),
-  //    request.projection_near_clip  (),
-  //    request.projection_far_clip   ()
-  //  };
-  //
-  //ray_tracer->background.load(request.background_image());
+  if (request.has_metric())
+  {
+    if      (request.metric() == "minkowski")
+      ray_tracer_.emplace<ray_tracer<metrics::minkowski      <scalar_type>, motion_type>>();
+    else if (request.metric() == "goedel")
+      ray_tracer_.emplace<ray_tracer<metrics::goedel         <scalar_type>, motion_type>>();
+    else if (request.metric() == "schwarzschild")
+      ray_tracer_.emplace<ray_tracer<metrics::schwarzschild  <scalar_type>, motion_type>>();
+    else if (request.metric() == "kerr")
+      ray_tracer_.emplace<ray_tracer<metrics::kerr           <scalar_type>, motion_type>>();
+    else if (request.metric() == "kastor_traschen")
+      ray_tracer_.emplace<ray_tracer<metrics::kastor_traschen<scalar_type>, motion_type>>();
+  }
+
+  std::visit([&] (auto& ray_tracer)
+  {
+    if (request.has_image_size      ())
+      ray_tracer.partitioner.set_domain_size({request.image_size().x(), request.image_size().y()});
+    if (request.has_iterations      ())
+      ray_tracer.iterations       = request.iterations();
+    if (request.has_lambda_step_size())
+      ray_tracer.lambda_step_size = request.lambda_step_size();
+    if (request.has_lambda          ())
+      ray_tracer.lambda           = request.lambda();
+    if (request.has_debug           ())
+      ray_tracer.debug            = request.debug();
+    
+    if (request.has_bounds          ())
+    {
+      auto& bounds = request.bounds();
+      auto& lower  = bounds .lower ();
+      auto& upper  = bounds .upper ();
+      ray_tracer.bounds           = aabb4<scalar_type>(
+        vector4<scalar_type>(lower.t(), lower.x(), lower.y(), lower.z()),
+        vector4<scalar_type>(upper.t(), upper.x(), upper.y(), upper.z()));
+    }
+
+    if (request.has_transform       ())
+    {
+      auto& transform = request.transform();
+
+      if (transform.has_time          ())
+        ray_tracer.observer.coordinate_time = request.transform().time();
+
+      if (transform.has_position      ())
+      {
+        auto& position = transform.position();
+        ray_tracer.observer.transform.translation = {position.x(), position.y(), position.z()};
+      }
+      
+      if (transform.has_rotation_euler())
+      {
+        auto& rotation = transform.rotation_euler();
+        ray_tracer.observer.transform.rotation_from_euler({rotation.x(), rotation.y(), rotation.z()});
+      }
+
+      if (transform.has_look_at_origin() && transform.look_at_origin())
+        ray_tracer.observer.transform.look_at({0, 0, 0});
+    }
+
+    if (request.has_perspective     ())
+    {
+      if (!std::holds_alternative<perspective_projection<scalar_type>>(ray_tracer.observer.projection))
+      {
+        const auto& image_size         = ray_tracer.partitioner.domain_size();
+        const auto  aspect_ratio       = static_cast<scalar_type>(image_size[0]) / static_cast<scalar_type>(image_size[1]);
+        ray_tracer.observer.projection = perspective_projection<scalar_type> {to_radians<scalar_type>(75), aspect_ratio};
+      }
+
+      const auto& perspective          = request.perspective();
+      auto&       cast_projection      = std::get<perspective_projection<scalar_type>>(ray_tracer.observer.projection);
+
+      if (perspective.has_y_field_of_view())
+        cast_projection.fov_y          = perspective.y_field_of_view();
+      if (perspective.has_focal_length   ())
+        cast_projection.focal_length   = perspective.focal_length   ();
+      if (perspective.has_near_clip      ())
+        cast_projection.near_clip      = perspective.near_clip      ();
+      if (perspective.has_far_clip       ())
+        cast_projection.far_clip       = perspective.far_clip       ();
+    }
+
+    if (request.has_orthographic    ())
+    {
+      if (!std::holds_alternative<orthographic_projection<scalar_type>>(ray_tracer.observer.projection))
+      {
+        const auto& image_size         = ray_tracer.partitioner.domain_size();
+        const auto  aspect_ratio       = static_cast<scalar_type>(image_size[0]) / static_cast<scalar_type>(image_size[1]);
+        ray_tracer.observer.projection = orthographic_projection<scalar_type> {1, aspect_ratio};
+      }
+
+      const auto& perspective          = request.orthographic();
+      auto&       cast_projection      = std::get<orthographic_projection<scalar_type>>(ray_tracer.observer.projection);
+      
+      if (perspective.has_height   ())
+        cast_projection.height         = perspective.height   ();
+      if (perspective.has_near_clip())
+        cast_projection.near_clip      = perspective.near_clip();
+      if (perspective.has_far_clip ())
+        cast_projection.far_clip       = perspective.far_clip ();
+    }
+
+    if (request.has_background_image())
+    {
+      auto& background = request.background_image();
+      ray_tracer.background.size = {background.size().x(), background.size().y()};
+      ray_tracer.background.data.resize(ray_tracer.background.size.prod());
+      std::copy_n(background.data().data(), background.data().size(), reinterpret_cast<std::uint8_t*>(ray_tracer.background.data.data()));
+    }
+  }, ray_tracer_);
 }
 }

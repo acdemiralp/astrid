@@ -14,18 +14,18 @@ message request
 	optional string       tableau                     = 3;  // Not implemented.
 	optional string       error_controller            = 4;  // Not implemented.
 	repeated float        error_controller_parameters = 5;  // Not implemented.
-									      
-	optional ivec2        image_size                  = 6; 
-	optional uint64       iterations                  = 7; 
-	optional float        lambda_step_size            = 8; 
-	optional float        lambda                      = 9; 
+
+	optional ivec2        image_size                  = 6;
+	optional uint64       iterations                  = 7;
+	optional float        lambda_step_size            = 8;
+	optional float        lambda                      = 9;
 	optional bounds       bounds                      = 10;
 
 	optional transform    transform                   = 11;
-	optional perspective  perspective                 = 12;
-	optional orthographic orthographic                = 13;
-	optional image        background_image            = 14;
-																				            
+	optional perspective  perspective                 = 12; 
+	optional orthographic orthographic                = 13; 
+	optional image        background_image            = 14; 
+
 	optional bool         debug                       = 15;
 	optional bool         terminate                   = 16;
 }

@@ -6,5 +6,5 @@
 
 namespace ast::user_interface
 {
-std::int32_t run(const cxxopts::ParseResult& options);
+std::int32_t run(std::int32_t argc, char** argv, const cxxopts::ParseResult& options);
 }

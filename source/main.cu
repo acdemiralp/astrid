@@ -13,5 +13,5 @@ std::int32_t main(const std::int32_t argc, char** argv)
     ("p,port"  , "Server port."              , cxxopts::value<std::int32_t>()->default_value("3000" ));
   const auto result = options.parse(argc, argv);
 
-  return result.count("server") ? ast::service::run(result) : ast::user_interface::run(result);
+  return result.count("server") ? ast::service::run(result) : ast::user_interface::run(argc, argv, result);
 }

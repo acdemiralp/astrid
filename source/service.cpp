@@ -46,12 +46,12 @@ std::int32_t service::run(std::int32_t argc, char** argv)
     communicator.bcast         (data.data(), size, mpi::data_type(MPI_BYTE));
     request     .ParseFromArray(data.data(), static_cast<std::int32_t>(data.size()));
     
-    image<float> result; // TODO: Render the image according to the request.
+    image<vector3<std::uint8_t>> result({32, 32}, {255, 0, 0}); // TODO: Render the image according to the request.
 
     if (communicator.rank() == 0)
     {
       ::image image;
-      image.mutable_data()->assign(result.data.begin(), result.data.end());
+      image.set_data(static_cast<void*>(result.data.data()), result.data.size() * sizeof(vector3<std::uint8_t>));
       image.mutable_size()->set_x (result.size[0]);
       image.mutable_size()->set_y (result.size[1]);
       auto string = image.SerializeAsString();

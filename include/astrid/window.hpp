@@ -1,11 +1,11 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
 #include <QMainWindow>
+#include <QWidget>
 
-#include <astrid/connection_state.hpp>
+#include <astrid/client.hpp>
 #include <ui_main_window.h>
 
 namespace ast
@@ -18,9 +18,7 @@ public:
   explicit window(QWidget* parent = nullptr);
 
 private:
-  std::unique_ptr<Ui::main_window> ui_;
-
-  QString          server_address_;
-  connection_state connection_state_ = connection_state::disconnected;
+  std::unique_ptr<Ui::main_window> ui_    ;
+  std::unique_ptr<client>          client_;
 };
 }

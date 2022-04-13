@@ -38,6 +38,9 @@ list        (APPEND PROJECT_LIBRARIES cppzmq)
 find_package(cxxopts CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES cxxopts::cxxopts)
 
+find_package(PalSigslot CONFIG REQUIRED)
+list        (APPEND PROJECT_LIBRARIES Pal::Sigslot)
+
 find_package(Protobuf CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES protobuf::libprotoc protobuf::libprotobuf)
 
@@ -47,7 +50,7 @@ qt5_wrap_ui (PROJECT_GENERATED_UIS ${PROJECT_UIS})
 list        (APPEND PROJECT_FILES ${PROJECT_GENERATED_UIS})
 set         (CMAKE_AUTOMOC ON)
 set         (CMAKE_AUTORCC ON)
-
+  
 find_package(ZeroMQ CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES libzmq)
 

@@ -7,12 +7,12 @@
 #include <cxxopts.hpp>
 #include <zmq.hpp>
 
+#include <image.pb.h>
 #include <request.pb.h>
-#include <response.pb.h>
 
 namespace ast
 {
-class service
+class server
 {
 public:
   using scalar_type           = float;
@@ -29,17 +29,17 @@ public:
   using pixel_type            = vector3<std::uint8_t>;
   using image_type            = image<pixel_type>;
 
-  explicit service  (const cxxopts::ParseResult& options);
-  service           (const service&  that) = delete ;
-  service           (      service&& temp) = delete ;
-  virtual ~service  ()                     = default;
-  service& operator=(const service&  that) = delete ;
-  service& operator=(      service&& temp) = delete ;
+  explicit server  (const cxxopts::ParseResult& options);
+  server           (const server&  that) = delete ;
+  server           (      server&& temp) = delete ;
+  virtual ~server  ()                    = default;
+  server& operator=(const server&  that) = delete ;
+  server& operator=(      server&& temp) = delete ;
 
-  void       run      ();
+  void run   ();
 
 protected:
-  void       configure(const request& request);
+  void update(const request& request);
 
   mpi::environment  environment_ ;
   mpi::communicator communicator_;

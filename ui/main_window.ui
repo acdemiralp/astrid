@@ -23,12 +23,12 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="layout_tools">
         <item>
          <widget class="QToolBox" name="toolbox">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -843,6 +843,9 @@
         </item>
         <item>
          <widget class="QFrame" name="frame_render">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>1</horstretch>
@@ -929,19 +932,23 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="action_connect"/>
+    <addaction name="action_connect_local"/>
+    <addaction name="action_connect_remote"/>
     <addaction name="action_disconnect"/>
     <addaction name="separator"/>
     <addaction name="action_exit"/>
    </widget>
    <addaction name="menu_file"/>
   </widget>
-  <action name="action_connect">
+  <action name="action_connect_remote">
    <property name="text">
-    <string>Connect</string>
+    <string>Connect to Remote</string>
    </property>
   </action>
   <action name="action_disconnect">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Disconnect</string>
    </property>
@@ -949,6 +956,11 @@
   <action name="action_exit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="action_connect_local">
+   <property name="text">
+    <string>Launch and Connect to Local</string>
    </property>
   </action>
  </widget>

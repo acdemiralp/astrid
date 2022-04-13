@@ -1,4 +1,4 @@
-#include <astrid/service.hpp>
+#include <astrid/server.hpp>
 
 #include <iostream>
 #include <string>
@@ -9,7 +9,7 @@
 
 namespace ast
 {
-service::service(const cxxopts::ParseResult& options)
+server::server(const cxxopts::ParseResult& options)
 {
   if (communicator_.rank() == 0)
   {
@@ -19,7 +19,7 @@ service::service(const cxxopts::ParseResult& options)
   }
 }
 
-void service::run      ()
+void server::run   ()
 {
   request                   request     ;
   ::image                   response    ;
@@ -44,7 +44,7 @@ void service::run      ()
     communicator_.bcast         (message_data.data(), message_size, mpi::data_type(MPI_BYTE));
     request      .ParseFromArray(message_data.data(), static_cast<std::int32_t>(message_data.size()));
     
-    configure(request);
+    update(request);
     std::visit([&] (auto& ray_tracer) { image = ray_tracer.render_frame(); }, ray_tracer_);
 
     if (communicator_.rank() == 0)
@@ -62,7 +62,7 @@ void service::run      ()
   }
 }
 
-void service::configure(const request& request)
+void server::update(const request& request)
 {
   if (request.has_metric())
   {

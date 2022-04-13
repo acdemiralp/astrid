@@ -1,7 +1,10 @@
 #include <astrid/window.hpp>
 
+#include <QString>
 #include <QInputDialog>
 #include <QLineEdit>
+
+#include <astrid/make_local_server.hpp>
 
 namespace ast
 {
@@ -12,37 +15,48 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
   setWindowTitle("Astrid");
   resize        (1024, 600);
   
-  connect(ui_->action_connect   , &QAction::triggered, this, [&] ()
+  connect(ui_->action_connect_local , &QAction::triggered, this, [&] 
   {
-    bool ok;
-    const auto result = QInputDialog::getText(
+    statusBar()->showMessage("Connecting to local server.");
+    make_local_server();
+    client_ = std::make_unique<client>();
+    client_->on_receive.connect([&] (const image& image)
+    {
+      //ui_->image->setPixmap(QPixmap::fromImage(QImage(
+      //  reinterpret_cast<const unsigned char*>(image.data().c_str()),
+      //  image.size().x(),
+      //  image.size().y(),
+      //  QImage::Format_RGB888)));
+    });
+  });
+  connect(ui_->action_connect_remote, &QAction::triggered, this, [&] 
+  {
+    bool confirm;
+    const auto address = QInputDialog::getText(
       this, 
       "Connect", 
       "Enter the IP address and port of the Astrid server:",
       QLineEdit::Normal,
       "127.0.0.1:3000",
-      &ok);
+      &confirm);
 
-    if (ok)
+    if (confirm)
     {
-      statusBar()->showMessage("Connecting to " + result + ".");
-
-      server_address_ = result;
-      // TODO: Attempt to connect to server_address_.
+      statusBar()->showMessage("Connecting to remote server " + address + ".");
+      client_ = std::make_unique<client>(address.toStdString());
     }
   });
-  connect(ui_->action_disconnect, &QAction::triggered, this, [&] ()
+  connect(ui_->action_disconnect    , &QAction::triggered, this, [&] 
   {
-    statusBar()->showMessage("Disconnecting from " + server_address_ + ".");
-
-    // TODO: Disconnect.
+    statusBar()->showMessage("Disconnecting from server.");
+    client_.reset();
   });
-  connect(ui_->action_exit      , &QAction::triggered, this, [&] ()
+  connect(ui_->action_exit          , &QAction::triggered, this, [&] 
   {
     std::exit(0);
   });
-
-  // TODO.
+  
+  // TODO: Program toolbox elements, render button.
   
   statusBar()->showMessage("Initialization successful.");
 }

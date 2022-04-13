@@ -1,34 +1,31 @@
 syntax = "proto3";
 
 import "basic_types.proto";
+import "bounds.proto";
+import "image.proto";
+import "orthographic.proto";
+import "perspective.proto";
+import "transform.proto";
 
 message request 
 {
-	string         metric_type                 = 1;
-	repeated float metric_parameters           = 2;  // Not implemented.
-	string         tableau_type                = 3;  // Not implemented.
-	string         error_controller_type       = 4;  // Not implemented.
-	repeated float error_controller_parameters = 5;  // Not implemented.
+	optional string       metric                      = 1;
+	repeated float        metric_parameters           = 2;  // Not implemented.
+	optional string       tableau                     = 3;  // Not implemented.
+	optional string       error_controller            = 4;  // Not implemented.
+	repeated float        error_controller_parameters = 5;  // Not implemented.
+									      
+	optional ivec2        image_size                  = 6; 
+	optional uint64       iterations                  = 7; 
+	optional float        lambda_step_size            = 8; 
+	optional float        lambda                      = 9; 
+	optional bounds       bounds                      = 10;
 
-	ivec2          image_size                  = 6; 
-	uint64         iterations                  = 7; 
-	float          lambda_step_size            = 8; 
-	float          lambda                      = 9; 
-	fvec4          lower_bound                 = 10;
-	fvec4          upper_bound                 = 11;
-	
-	float          coordinate_time             = 12;
-	fvec3          position                    = 13;
-	fvec3          rotation                    = 14;
-	bool           look_at_origin              = 15;
-	string         projection_type             = 16;
-	float          projection_fov_y            = 17;
-	float          projection_focal_length     = 18;
-	float          projection_height           = 19;
-	float          projection_near_clip        = 20;
-	float          projection_far_clip         = 21;
-	string         background_image            = 22;
-
-	bool           debug                       = 23;
-	bool           terminate                   = 24;
+	optional transform    transform                   = 11;
+	optional perspective  perspective                 = 12;
+	optional orthographic orthographic                = 13;
+	optional image        background_image            = 14;
+																				            
+	optional bool         debug                       = 15;
+	optional bool         terminate                   = 16;
 }

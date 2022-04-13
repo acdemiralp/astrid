@@ -34,15 +34,16 @@ list        (APPEND PROJECT_LIBRARIES cxxopts::cxxopts)
 find_package(Protobuf CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES protobuf::libprotoc protobuf::libprotobuf)
 
-set         (CMAKE_AUTOMOC ON)
-set         (CMAKE_AUTOUIC ON)
 find_package(Qt5Widgets REQUIRED)
 list        (APPEND PROJECT_LIBRARIES Qt5::Widgets)
+set         (CMAKE_AUTOMOC ON)
+set         (CMAKE_AUTORCC ON)
+set         (CMAKE_AUTOUIC ON)
 
 find_package(ZeroMQ CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES libzmq)
 
-enable_language(CUDA)
+enable_language(CUDA) # Hack.
 
 ##################################################    Targets     ##################################################
 add_executable(${PROJECT_NAME} ${PROJECT_FILES})

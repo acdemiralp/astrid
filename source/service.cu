@@ -60,7 +60,7 @@ constexpr auto make_ray_tracer(const request& request)
   return std::move(ray_tracer);
 }
 
-std::int32_t service::run(std::int32_t argc, char** argv) 
+std::int32_t service::run(const cxxopts::ParseResult& options)
 {
   mpi::environment  environment ;
   mpi::communicator communicator;
@@ -69,7 +69,7 @@ std::int32_t service::run(std::int32_t argc, char** argv)
   zmq::socket_t     socket (context, ZMQ_PAIR);
   if (communicator.rank() == 0)
   {
-    const std::string address = "tcp://*:3000"; // TODO: Retrieve port from arguments.
+    std::string address = std::string("tcp://*:") + (options.count("port") ? std::to_string(options["port"].as<std::int32_t>()) : "3000");
     socket.bind(address);
     std::cout << "Service running at: " << address << "\n";
   }

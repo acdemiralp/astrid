@@ -28,6 +28,9 @@ list        (APPEND PROJECT_LIBRARIES astray)
 find_package(cppzmq CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES cppzmq)
 
+find_package(cxxopts CONFIG REQUIRED)
+list        (APPEND PROJECT_LIBRARIES cxxopts::cxxopts)
+
 find_package(Protobuf CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES protobuf::libprotoc protobuf::libprotobuf)
 

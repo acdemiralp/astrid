@@ -1,20 +1,19 @@
 #include <astrid/client.hpp>
 
-#include <cstdint>
-
-#include <zmq.hpp>
+#include <stdexcept>
 
 namespace ast
 {
-client::client (const std::string& address) : address_("tcp://" + address), alive_(true)
+client::client (const std::string& address, const std::int32_t timeout_ms) : address_("tcp://" + address)
 {
+  zmq::monitor_t monitor;
+  monitor.init   (socket_, "inproc://monitor", ZMQ_EVENT_CONNECTED);
+  socket_.connect(address_);
+  if (!monitor.check_event(timeout_ms))
+    throw std::runtime_error("Server unreachable.");
+  
   future_ = std::async(std::launch::async, [&]
   {
-    zmq::context_t context {1};
-    zmq::socket_t  socket  {context, ZMQ_PAIR};
-    zmq::message_t message;
-
-    socket.connect(address_);
     while (alive_)
     {
       if (request_auto_ || request_once_)
@@ -26,10 +25,10 @@ client::client (const std::string& address) : address_("tcp://" + address), aliv
 
         auto string = request_data_.SerializeAsString();
 
-        message.rebuild(string.data(), string.size());
-        socket .send   (message);
+        zmq::message_t message(string.data(), string.size());
+        socket_ .send   (message);
         message.rebuild();
-        socket .recv   (message);
+        socket_ .recv   (message);
 
         response_data_.ParseFromArray(message.data(), static_cast<std::int32_t>(message.size()));
 

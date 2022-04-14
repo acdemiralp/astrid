@@ -211,49 +211,57 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
 void window::create_client (const std::string& address)
 {
   statusBar()->showMessage("Connecting to " + QString::fromStdString(address) + ". Please wait.");
+  repaint  ();
 
-  client_ = std::make_unique<client>(address);
-  
-  // TODO: Check if connection successful. Right now it assumes everything is normal but gets forever stuck at first render.
-
-  connect(client_.get(), &client::on_send_request    , this, [&]
+  try
   {
-    if (!client_) return;
+    client_ = std::make_unique<client>(address);
 
-    statusBar()->showMessage("Sending render request to the server. Please wait.");
-
-    auto& request = client_->request_data();
-
-    // TODO: Fill the request (ideally only with the values that changed, ideally not here, but whenever the values change).
-    request.mutable_image_size()->set_x(ui_->image->width ());
-    request.mutable_image_size()->set_y(ui_->image->height());
-  });
-  connect(client_.get(), &client::on_receive_response, this, [&]
-  {
-    if (client_)
+    connect(client_.get(), &client::on_send_request    , this, [&]
     {
-      statusBar()->showMessage("Received image from the server.");
+      if (!client_) return;
 
-      const auto& image = client_->response_data();
-      ui_->image->setPixmap(QPixmap::fromImage(QImage(
-        reinterpret_cast<const unsigned char*>(image.data().c_str()),
-        image.size().x(),
-        image.size().y(),
-        QImage::Format_RGB888)));
-    }
+      statusBar()->showMessage("Sending render request to the server. Please wait.");
 
-    if(!ui_->checkbox_autorender->isChecked())
-      ui_->button_render->setEnabled(true);
-  });
-  connect(client_.get(), &client::on_finalize        , this, [&]
+      auto& request = client_->request_data();
+
+      // TODO: Fill the request (ideally only with the values that changed).
+      // Also ideally not here, but whenever the values change.
+      // Why? Because request appears non-atomic. The changes here may not reach the current request.
+      request.mutable_image_size()->set_x(ui_->image->width ());
+      request.mutable_image_size()->set_y(ui_->image->height());
+    });
+    connect(client_.get(), &client::on_receive_response, this, [&]
+    {
+      if (client_)
+      {
+        statusBar()->showMessage("Received image from the server.");
+
+        const auto& image = client_->response_data();
+        ui_->image->setPixmap(QPixmap::fromImage(QImage(
+          reinterpret_cast<const unsigned char*>(image.data().c_str()),
+          image.size().x(),
+          image.size().y(),
+          QImage::Format_RGB888)));
+      }
+
+      if(!ui_->checkbox_autorender->isChecked())
+        ui_->button_render->setEnabled(true);
+    });
+    connect(client_.get(), &client::on_finalize        , this, [&]
+    {
+      statusBar()->showMessage("Disconnected from the server.");
+      set_ui_state(false);
+      client_.reset();
+    });
+
+    statusBar()->showMessage("Connected to " + QString::fromStdString(address) + ".");
+    set_ui_state(true);
+  }
+  catch (const std::runtime_error& error)
   {
-    statusBar()->showMessage("Disconnected from the server.");
-    set_ui_state(false);
-    client_.reset();
-  });
-
-  statusBar()->showMessage("Connected to " + QString::fromStdString(address) + ".");
-  set_ui_state(true);
+    statusBar()->showMessage("Failed to connect " + QString::fromStdString(address) + ".");
+  }
 }
 void window::destroy_client() 
 {

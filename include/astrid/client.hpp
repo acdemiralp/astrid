@@ -1,10 +1,12 @@
 #pragma once
 
 #include <atomic>
+#include <cstdint>
 #include <future>
 #include <string>
 
 #include <QObject>
+#include <zmq.hpp>
 
 #include <request.pb.h>
 #include <image.pb.h>
@@ -16,7 +18,7 @@ class client : public QObject
   Q_OBJECT
 
 public:
-  explicit client  (const std::string& address = "127.0.0.1:3000");
+  explicit client  (const std::string& address = "127.0.0.1:3000", const std::int32_t timeout_ms = 5000);
   client           (const client&  that) = delete;
   client           (      client&& temp) = delete;
   virtual ~client  ();
@@ -51,9 +53,13 @@ signals:
   void         on_finalize        ();
   
 protected:
+  zmq::context_t    context_      {1};
+  zmq::socket_t     socket_       {context_, ZMQ_PAIR};
   std::string       address_      ;
+  
   std::future<void> future_       ;
-  std::atomic<bool> alive_        ;
+  std::atomic<bool> alive_        {true};
+
   std::atomic<bool> request_once_ ;
   std::atomic<bool> request_auto_ ;
   ::request         request_data_ ;

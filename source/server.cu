@@ -9,11 +9,11 @@
 
 namespace ast
 {
-server::server(const cxxopts::ParseResult& options)
+server::server(const std::int32_t port)
 {
   if (communicator_.rank() == 0)
   {
-    const auto address = std::string("tcp://*:") + (options.count("port") ? std::to_string(options["port"].as<std::int32_t>()) : "3000");
+    const auto address = std::string("tcp://*:") + std::to_string(port);
     socket_.bind(address);
     std::cout << "Socket bound at: " << address << ".\n";
   }

@@ -38,9 +38,6 @@ list        (APPEND PROJECT_LIBRARIES cppzmq)
 find_package(cxxopts CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES cxxopts::cxxopts)
 
-find_package(PalSigslot CONFIG REQUIRED)
-list        (APPEND PROJECT_LIBRARIES Pal::Sigslot)
-
 find_package(Protobuf CONFIG REQUIRED)
 list        (APPEND PROJECT_LIBRARIES protobuf::libprotoc protobuf::libprotobuf)
 

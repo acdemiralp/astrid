@@ -4,7 +4,6 @@
 #include <variant>
 
 #include <astray/api.hpp>
-#include <cxxopts.hpp>
 #include <zmq.hpp>
 
 #include <image.pb.h>
@@ -29,7 +28,7 @@ public:
   using pixel_type            = vector3<std::uint8_t>;
   using image_type            = image<pixel_type>;
 
-  explicit server  (const cxxopts::ParseResult& options);
+  explicit server  (std::int32_t port);
   server           (const server&  that) = delete ;
   server           (      server&& temp) = delete ;
   virtual ~server  ()                    = default;

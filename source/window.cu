@@ -20,14 +20,6 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
     statusBar()->showMessage("Connecting to local server.");
     make_local_server();
     client_ = std::make_unique<client>();
-    client_->on_receive.connect([&] (const image& image)
-    {
-      //ui_->image->setPixmap(QPixmap::fromImage(QImage(
-      //  reinterpret_cast<const unsigned char*>(image.data().c_str()),
-      //  image.size().x(),
-      //  image.size().y(),
-      //  QImage::Format_RGB888)));
-    });
   });
   connect(ui_->action_connect_remote, &QAction::triggered, this, [&] 
   {
@@ -56,6 +48,18 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
     std::exit(0);
   });
   
+  make_local_server();
+  client_ = std::make_unique<client>();
+  connect(client_.get(), &client::on_receive_response, this, [&]()
+  {
+    ui_->image->setPixmap(QPixmap::fromImage(QImage(
+      reinterpret_cast<const unsigned char*>(client_->response_data().data().c_str()),
+      client_->response_data().size().x(),
+      client_->response_data().size().y(),
+      QImage::Format_RGB888)));
+  });
+  client_->make_request();
+
   // TODO: Program toolbox elements, render button.
   
   statusBar()->showMessage("Initialization successful.");

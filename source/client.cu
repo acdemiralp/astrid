@@ -12,22 +12,29 @@ client::client (const std::string& address) : address_("tcp://" + address), aliv
   {
     zmq::context_t context {1};
     zmq::socket_t  socket  {context, ZMQ_PAIR};
-    socket.connect(address_);
+    zmq::message_t message;
 
+    socket.connect(address_);
     while (alive_)
     {
-      request request;
-      on_send(request_cache_, request);
+      if (request_auto_ || request_once_)
+      {
+        if (request_once_)
+          request_once_ = false;
+        
+        on_send_request();
 
-      auto string = request.SerializeAsString();
-      zmq::message_t message(string.begin(), string.end());
-      socket .send   (message);
-      message.rebuild();
-      socket .recv   (message);
+        auto string = request_data_.SerializeAsString();
 
-      image image;
-      image.ParseFromArray(message.data(), static_cast<std::int32_t>(message.size()));
-      on_receive(image);
+        message.rebuild(string.data(), string.size());
+        socket .send   (message);
+        message.rebuild();
+        socket .recv   (message);
+
+        response_data_.ParseFromArray(message.data(), static_cast<std::int32_t>(message.size()));
+
+        on_receive_response();
+      }
     }
   });
 }

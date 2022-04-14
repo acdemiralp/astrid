@@ -199,7 +199,7 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
   
   connect(ui_->combobox_projection_type      , &QComboBox  ::currentTextChanged, this, [&] (const QString& text)
   {
-    const bool is_perspective = text == "Perspective";
+    const bool is_perspective = text == "perspective";
     ui_->line_edit_fov_y       ->setEnabled( is_perspective);
     ui_->line_edit_focal_length->setEnabled( is_perspective);
     ui_->line_edit_size_ortho  ->setEnabled(!is_perspective);
@@ -226,6 +226,7 @@ void window::create_client (const std::string& address)
       auto& request = client_->request_data();
 
       // TODO: Fill the request ideally only with the values that changed.
+      auto metric_name = ui_->combobox_metric->currentText().toStdString();
       *request.mutable_metric     () = ui_->combobox_metric->currentText().toStdString();
 
       request.mutable_image_size  ()->set_x(ui_->image->width () - 2 * ui_->image->frameWidth());

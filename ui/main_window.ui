@@ -86,27 +86,27 @@
                <widget class="QComboBox" name="combobox_metric">
                 <item>
                  <property name="text">
-                  <string>Minkowski</string>
+                  <string>minkowski</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Goedel</string>
+                  <string>goedel</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Schwarzschild</string>
+                  <string>schwarzschild</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Kerr</string>
+                  <string>kerr</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Kastor Traschen</string>
+                  <string>kastor_traschen</string>
                  </property>
                 </item>
                </widget>
@@ -467,12 +467,12 @@
                <widget class="QComboBox" name="combobox_projection_type">
                 <item>
                  <property name="text">
-                  <string>Perspective</string>
+                  <string>perspective</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Orthographic</string>
+                  <string>orthographic</string>
                  </property>
                 </item>
                </widget>

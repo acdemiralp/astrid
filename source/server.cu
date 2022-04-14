@@ -49,6 +49,7 @@ void server::run   ()
 
     if (communicator_.rank() == 0)
     {
+      image.save("debug.png");
       response.set_data(static_cast<void*>(image.data.data()), image.data.size() * sizeof(vector3<std::uint8_t>));
       response.mutable_size()->set_x (image.size[0]);
       response.mutable_size()->set_y (image.size[1]);

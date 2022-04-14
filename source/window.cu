@@ -282,13 +282,11 @@ void window::create_client (const std::string& address)
       {
         image<vector3<std::uint8_t>> image;
         image.load(ui_->line_edit_background->text().toStdString());
-
+        
         request.mutable_background_image()->set_data(static_cast<void*>(image.data.data()), image.data.size() * sizeof(vector3<std::uint8_t>));
         request.mutable_background_image()->mutable_size()->set_x(image.size[0]);
         request.mutable_background_image()->mutable_size()->set_y(image.size[1]);
       }
-
-      // TODO: Interaction.
     });
     connect(client_.get(), &client::on_receive_response, this, [&]
     {
@@ -302,7 +300,9 @@ void window::create_client (const std::string& address)
           reinterpret_cast<const unsigned char*>(image.data().c_str()),
           image.size().x(),
           image.size().y(),
-          QImage::Format_RGB888)));
+          QImage::Format_RGB888))); 
+          
+        // TODO: QImage bugs out for certain x, y. Power of two problem? + Interaction.
       }
 
       if(!ui_->checkbox_autorender->isChecked())

@@ -561,21 +561,21 @@
                 <item>
                  <widget class="QLineEdit" name="line_edit_position_x">
                   <property name="text">
-                   <string>0.0</string>
+                   <string>0.1</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLineEdit" name="line_edit_position_y">
                   <property name="text">
-                   <string>0.0</string>
+                   <string>0.1</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLineEdit" name="line_edit_position_z">
                   <property name="text">
-                   <string>-10.0</string>
+                   <string>-5.0</string>
                   </property>
                  </widget>
                 </item>
@@ -906,6 +906,12 @@
          <horstretch>3</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>1</width>
+         <height>1</height>
+        </size>
        </property>
        <property name="styleSheet">
         <string notr="true">background-color : #111111;</string>

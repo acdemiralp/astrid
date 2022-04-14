@@ -225,9 +225,57 @@ void window::create_client (const std::string& address)
 
       auto& request = client_->request_data();
 
-      // TODO: Fill the request (ideally only with the values that changed). Make request atomic within the scope of this lambda.
-      request.mutable_image_size()->set_x(ui_->image->width () - 2 * ui_->image->frameWidth());
-      request.mutable_image_size()->set_y(ui_->image->height() - 2 * ui_->image->frameWidth());
+      // TODO: Fill the request ideally only with the values that changed.
+      *request.mutable_metric     () = ui_->combobox_metric->currentText().toStdString();
+
+      request.mutable_image_size  ()->set_x(ui_->image->width () - 2 * ui_->image->frameWidth());
+      request.mutable_image_size  ()->set_y(ui_->image->height() - 2 * ui_->image->frameWidth());
+
+      request.set_iterations      (ui_->line_edit_iterations      ->text().toULongLong());
+      request.set_lambda_step_size(ui_->line_edit_lambda_step_size->text().toFloat    ());
+      request.set_lambda          (ui_->line_edit_lambda          ->text().toFloat    ());
+      request.set_debug           (ui_->checkbox_debug            ->isChecked());
+
+      if (ui_->checkbox_use_bounds->isChecked())
+      {
+        request.mutable_bounds()->mutable_lower()->set_t(ui_->line_edit_lower_bound_t->text().toFloat());
+        request.mutable_bounds()->mutable_lower()->set_x(ui_->line_edit_lower_bound_x->text().toFloat());
+        request.mutable_bounds()->mutable_lower()->set_y(ui_->line_edit_lower_bound_y->text().toFloat());
+        request.mutable_bounds()->mutable_lower()->set_z(ui_->line_edit_lower_bound_z->text().toFloat());
+        request.mutable_bounds()->mutable_upper()->set_t(ui_->line_edit_upper_bound_t->text().toFloat());
+        request.mutable_bounds()->mutable_upper()->set_x(ui_->line_edit_upper_bound_x->text().toFloat());
+        request.mutable_bounds()->mutable_upper()->set_y(ui_->line_edit_upper_bound_y->text().toFloat());
+        request.mutable_bounds()->mutable_upper()->set_z(ui_->line_edit_upper_bound_z->text().toFloat());
+      }
+      else
+        request.clear_bounds();
+
+      request.mutable_transform()->set_time              (ui_->line_edit_coordinate_time->text().toFloat());
+      request.mutable_transform()->mutable_position      ()->set_x(ui_->line_edit_position_x->text().toFloat());
+      request.mutable_transform()->mutable_position      ()->set_y(ui_->line_edit_position_y->text().toFloat());
+      request.mutable_transform()->mutable_position      ()->set_z(ui_->line_edit_position_z->text().toFloat());
+      request.mutable_transform()->mutable_rotation_euler()->set_x(ui_->line_edit_rotation_x->text().toFloat());
+      request.mutable_transform()->mutable_rotation_euler()->set_y(ui_->line_edit_rotation_y->text().toFloat());
+      request.mutable_transform()->mutable_rotation_euler()->set_z(ui_->line_edit_rotation_z->text().toFloat());
+      request.mutable_transform()->set_look_at_origin    (ui_->checkbox_look_at_origin->isChecked());
+
+      if (ui_->combobox_projection_type->currentText() == "perspective")
+      {
+        request.clear_orthographic  ();
+        request.mutable_perspective ()->set_y_field_of_view(ui_->line_edit_fov_y       ->text().toFloat());
+        request.mutable_perspective ()->set_focal_length   (ui_->line_edit_focal_length->text().toFloat());
+        request.mutable_perspective ()->set_near_clip      (ui_->line_edit_near_clip   ->text().toFloat());
+        request.mutable_perspective ()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
+      }
+      else
+      {
+        request.clear_perspective   ();
+        request.mutable_orthographic()->set_height         (ui_->line_edit_size_ortho  ->text().toFloat());
+        request.mutable_orthographic()->set_near_clip      (ui_->line_edit_near_clip   ->text().toFloat());
+        request.mutable_orthographic()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
+      }
+
+      // TODO: Background environment map.
     });
     connect(client_.get(), &client::on_receive_response, this, [&]
     {

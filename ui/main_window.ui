@@ -38,7 +38,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>400</width>
+            <width>16777215</width>
             <height>16777215</height>
            </size>
           </property>
@@ -65,7 +65,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>398</width>
+             <width>570</width>
              <height>427</height>
             </rect>
            </property>
@@ -395,7 +395,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>398</width>
+             <width>570</width>
              <height>427</height>
             </rect>
            </property>
@@ -854,7 +854,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>400</width>
+            <width>16777215</width>
             <height>16777215</height>
            </size>
           </property>
@@ -918,6 +918,9 @@
        </property>
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
        </property>
       </widget>
      </widget>

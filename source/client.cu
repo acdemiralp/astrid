@@ -22,6 +22,7 @@ client::client (const std::string& address, const std::int32_t timeout_ms) : add
           request_once_ = false;
         
         on_send_request();
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Horrid.
 
         auto string = request_data_.SerializeAsString();
 

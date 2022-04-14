@@ -58,10 +58,10 @@ protected:
   std::string       address_      ;
   
   std::future<void> future_       ;
-  std::atomic<bool> alive_        {true};
+  std::atomic_bool  alive_        {true};
 
-  std::atomic<bool> request_once_ ;
-  std::atomic<bool> request_auto_ ;
+  std::atomic_bool  request_once_ ;
+  std::atomic_bool  request_auto_ ;
   ::request         request_data_ ;
   ::image           response_data_;
 };

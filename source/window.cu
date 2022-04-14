@@ -225,11 +225,9 @@ void window::create_client (const std::string& address)
 
       auto& request = client_->request_data();
 
-      // TODO: Fill the request (ideally only with the values that changed).
-      // Also ideally not here, but whenever the values change.
-      // Why? Because request appears non-atomic. The changes here may not reach the current request.
-      request.mutable_image_size()->set_x(ui_->image->width ());
-      request.mutable_image_size()->set_y(ui_->image->height());
+      // TODO: Fill the request (ideally only with the values that changed). Make request atomic within the scope of this lambda.
+      request.mutable_image_size()->set_x(ui_->image->width () - 2 * ui_->image->frameWidth());
+      request.mutable_image_size()->set_y(ui_->image->height() - 2 * ui_->image->frameWidth());
     });
     connect(client_.get(), &client::on_receive_response, this, [&]
     {

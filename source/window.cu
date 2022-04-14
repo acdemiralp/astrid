@@ -4,8 +4,6 @@
 #include <QInputDialog>
 #include <QLineEdit>
 
-#include <astrid/make_local_server.hpp>
-
 namespace ast
 {
 window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
@@ -15,13 +13,11 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
   setWindowTitle("Astrid");
   resize        (1024, 600);
   
-  connect(ui_->action_connect_local , &QAction::triggered, this, [&] 
+  connect(ui_->action_connect_local , &QAction::triggered       , this, [&] 
   {
-    statusBar()->showMessage("Connecting to local server.");
-    make_local_server();
-    client_ = std::make_unique<client>();
+    make_client();
   });
-  connect(ui_->action_connect_remote, &QAction::triggered, this, [&] 
+  connect(ui_->action_connect_remote, &QAction::triggered       , this, [&] 
   {
     bool confirm;
     const auto address = QInputDialog::getText(
@@ -33,35 +29,55 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
       &confirm);
 
     if (confirm)
-    {
-      statusBar()->showMessage("Connecting to remote server " + address + ".");
-      client_ = std::make_unique<client>(address.toStdString());
-    }
+      make_client(address.toStdString());
   });
-  connect(ui_->action_disconnect    , &QAction::triggered, this, [&] 
+  connect(ui_->action_disconnect    , &QAction::triggered       , this, [&] 
   {
-    statusBar()->showMessage("Disconnecting from server.");
     client_.reset();
+    statusBar()->showMessage("Disconnected from server.");
   });
-  connect(ui_->action_exit          , &QAction::triggered, this, [&] 
+  connect(ui_->action_exit          , &QAction::triggered       , this, [&] 
   {
     std::exit(0);
   });
   
-  make_local_server();
-  client_ = std::make_unique<client>();
-  connect(client_.get(), &client::on_receive_response, this, [&]()
+  connect(ui_->button_render        , &QPushButton::clicked     , this, [&]
   {
-    ui_->image->setPixmap(QPixmap::fromImage(QImage(
-      reinterpret_cast<const unsigned char*>(client_->response_data().data().c_str()),
-      client_->response_data().size().x(),
-      client_->response_data().size().y(),
-      QImage::Format_RGB888)));
+    if (client_)
+      client_->make_request();
   });
-  client_->make_request();
+  connect(ui_->checkbox_autorender  , &QCheckBox  ::stateChanged, this, [&]
+  {
+    if (client_)
+      client_->set_auto_request(ui_->checkbox_autorender->isChecked());
+  });
 
-  // TODO: Program toolbox elements, render button.
+  // TODO: Program toolbox elements.
   
   statusBar()->showMessage("Initialization successful.");
+}
+
+void window::make_client(const std::string& address)
+{
+  statusBar()->showMessage("Connecting to remote server " + QString::fromStdString(address) + ".");
+
+  client_ = std::make_unique<client>(address);
+  connect(client_.get(), &client::on_send_request    , this, [&]
+  {
+    auto& request = client_->request_data();
+
+    // TODO: Fill the request.
+  });
+  connect(client_.get(), &client::on_receive_response, this, [&]
+  {
+    const auto& image = client_->response_data();
+    ui_->image->setPixmap(QPixmap::fromImage(QImage(
+      reinterpret_cast<const unsigned char*>(image.data().c_str()),
+      image.size().x(),
+      image.size().y(),
+      QImage::Format_RGB888)));
+  });
+
+  statusBar()->showMessage("Connected to remote server " + QString::fromStdString(address) + ".");
 }
 }

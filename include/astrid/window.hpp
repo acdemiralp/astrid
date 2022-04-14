@@ -18,6 +18,8 @@ public:
   explicit window(QWidget* parent = nullptr);
 
 private:
+  void make_client(const std::string& address = "127.0.0.1:3000");
+
   std::unique_ptr<Ui::main_window> ui_    ;
   std::unique_ptr<client>          client_;
 };

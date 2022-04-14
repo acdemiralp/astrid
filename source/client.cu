@@ -36,6 +36,8 @@ client::client (const std::string& address) : address_("tcp://" + address), aliv
         on_receive_response();
       }
     }
+
+    on_finalize();
   });
 }
 client::~client()

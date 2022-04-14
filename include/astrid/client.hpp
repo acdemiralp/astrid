@@ -31,6 +31,10 @@ public:
   {
     request_auto_ = auto_request;
   }
+  void         kill               ()
+  {
+    alive_ = false;
+  }
 
   request&     request_data       ()
   {
@@ -44,6 +48,7 @@ public:
 signals:
   void         on_send_request    ();
   void         on_receive_response();
+  void         on_finalize        ();
   
 protected:
   std::string       address_      ;

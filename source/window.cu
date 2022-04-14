@@ -210,43 +210,55 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
 
 void window::create_client (const std::string& address)
 {
-  statusBar()->showMessage("Connecting to server " + QString::fromStdString(address) + ".");
+  statusBar()->showMessage("Connecting to " + QString::fromStdString(address) + ". Please wait.");
 
   client_ = std::make_unique<client>(address);
   
-  // TODO: Check if connection successful.
+  // TODO: Check if connection successful. Right now it assumes everything is normal but gets forever stuck at first render.
 
   connect(client_.get(), &client::on_send_request    , this, [&]
   {
-    statusBar()->showMessage("Sending render request to the server.");
+    if (!client_) return;
+
+    statusBar()->showMessage("Sending render request to the server. Please wait.");
 
     auto& request = client_->request_data();
 
-    // TODO: Fill the request.
+    // TODO: Fill the request (ideally only with the values that changed, ideally not here, but whenever the values change).
+    request.mutable_image_size()->set_x(ui_->image->width ());
+    request.mutable_image_size()->set_y(ui_->image->height());
   });
   connect(client_.get(), &client::on_receive_response, this, [&]
   {
-    statusBar()->showMessage("Received image from the server.");
+    if (client_)
+    {
+      statusBar()->showMessage("Received image from the server.");
 
-    const auto& image = client_->response_data();
-    ui_->image->setPixmap(QPixmap::fromImage(QImage(
-      reinterpret_cast<const unsigned char*>(image.data().c_str()),
-      image.size().x(),
-      image.size().y(),
-      QImage::Format_RGB888)));
+      const auto& image = client_->response_data();
+      ui_->image->setPixmap(QPixmap::fromImage(QImage(
+        reinterpret_cast<const unsigned char*>(image.data().c_str()),
+        image.size().x(),
+        image.size().y(),
+        QImage::Format_RGB888)));
+    }
 
     if(!ui_->checkbox_autorender->isChecked())
       ui_->button_render->setEnabled(true);
   });
+  connect(client_.get(), &client::on_finalize        , this, [&]
+  {
+    statusBar()->showMessage("Disconnected from the server.");
+    set_ui_state(false);
+    client_.reset();
+  });
 
+  statusBar()->showMessage("Connected to " + QString::fromStdString(address) + ".");
   set_ui_state(true);
-  statusBar()->showMessage("Connected to server " + QString::fromStdString(address) + ".");
 }
 void window::destroy_client() 
 {
-  client_.reset();
-  set_ui_state(false);
-  statusBar()->showMessage("Disconnected from server.");
+  statusBar()->showMessage("Disconnecting from the server. Please wait.");
+  client_->kill();
 }
 
 void window::set_ui_state  (const bool connected) const

@@ -21,7 +21,7 @@ client::client (const std::string& address, const std::int32_t timeout_ms) : add
         if (request_once_)
           request_once_ = false;
         
-        on_send_request();
+        emit on_send_request();
         std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Horrid.
 
         auto string = request_data_.SerializeAsString();
@@ -33,11 +33,11 @@ client::client (const std::string& address, const std::int32_t timeout_ms) : add
 
         response_data_.ParseFromArray(message.data(), static_cast<std::int32_t>(message.size()));
 
-        on_receive_response();
+        emit on_receive_response();
       }
     }
 
-    on_finalize();
+    emit on_finalize();
   });
 }
 client::~client()

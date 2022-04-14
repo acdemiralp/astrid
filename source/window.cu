@@ -1,5 +1,6 @@
 #include <astrid/window.hpp>
 
+#include <astray/api.hpp>
 #include <QString>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -225,12 +226,12 @@ void window::create_client (const std::string& address)
 
       auto& request = client_->request_data();
 
-      // TODO: Fill the request ideally only with the values that changed.
+      // TODO: Ideally only set the values that have changed.
       auto metric_name = ui_->combobox_metric->currentText().toStdString();
       *request.mutable_metric     () = ui_->combobox_metric->currentText().toStdString();
 
-      request.mutable_image_size  ()->set_x(ui_->image->width () - 2 * ui_->image->frameWidth());
-      request.mutable_image_size  ()->set_y(ui_->image->height() - 2 * ui_->image->frameWidth());
+      request.mutable_image_size  ()->set_x((ui_->image->width () / 2) * 2 - 2 * ui_->image->frameWidth());
+      request.mutable_image_size  ()->set_y((ui_->image->height() / 2) * 2 - 2 * ui_->image->frameWidth());
 
       request.set_iterations      (ui_->line_edit_iterations      ->text().toULongLong());
       request.set_lambda_step_size(ui_->line_edit_lambda_step_size->text().toFloat    ());
@@ -276,7 +277,18 @@ void window::create_client (const std::string& address)
         request.mutable_orthographic()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
       }
 
-      // TODO: Background environment map.
+      if (!ui_->line_edit_background->text().isNull () &&
+          !ui_->line_edit_background->text().isEmpty())
+      {
+        image<vector3<std::uint8_t>> image;
+        image.load(ui_->line_edit_background->text().toStdString());
+
+        request.mutable_background_image()->set_data(static_cast<void*>(image.data.data()), image.data.size() * sizeof(vector3<std::uint8_t>));
+        request.mutable_background_image()->mutable_size()->set_x(image.size[0]);
+        request.mutable_background_image()->mutable_size()->set_y(image.size[1]);
+      }
+
+      // TODO: Interaction.
     });
     connect(client_.get(), &client::on_receive_response, this, [&]
     {
@@ -285,6 +297,7 @@ void window::create_client (const std::string& address)
         statusBar()->showMessage("Received image from the server.");
 
         const auto& image = client_->response_data();
+        
         ui_->image->setPixmap(QPixmap::fromImage(QImage(
           reinterpret_cast<const unsigned char*>(image.data().c_str()),
           image.size().x(),

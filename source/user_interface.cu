@@ -22,6 +22,6 @@ std::int32_t user_interface::run(std::int32_t argc, char** argv)
   window window;
   window.show();
 
-  return application.exec();
+  return QApplication::exec();
 }
 }

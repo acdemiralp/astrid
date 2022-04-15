@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-message orthographic
-{
-	optional float height    = 1;
-	optional float near_clip = 2;
-	optional float far_clip  = 3;
-}

@@ -53,8 +53,6 @@ void server::run   ()
 
       zmq::message_t message(string.begin(), string.end());
       socket_.send(message, zmq::send_flags::none);
-
-      std::cout << "Sent response with size: " << response.size().x() << " " << response.size().y() << ".\n";
     }
   }
 }
@@ -121,46 +119,48 @@ void server::update(const request& request)
         ray_tracer.observer.transform.look_at({0, 0, 0});
     }
 
-    if (request.has_perspective     ())
+    if (request.has_projection      ())
     {
-      if (!std::holds_alternative<perspective_projection<scalar_type>>(ray_tracer.observer.projection))
+      const auto& projection   = request.projection();
+      const auto& image_size   = ray_tracer.partitioner.domain_size();
+      const auto  aspect_ratio = static_cast<scalar_type>(image_size[0]) / static_cast<scalar_type>(image_size[1]);
+
+      if (projection.has_type())
       {
-        const auto& image_size         = ray_tracer.partitioner.domain_size();
-        const auto  aspect_ratio       = static_cast<scalar_type>(image_size[0]) / static_cast<scalar_type>(image_size[1]);
-        ray_tracer.observer.projection = perspective_projection<scalar_type> {to_radians<scalar_type>(75), aspect_ratio};
+        if      (projection.type() == "perspective" )
+          ray_tracer.observer.projection = perspective_projection <scalar_type> {to_radians<scalar_type>(75), aspect_ratio};
+        else if (projection.type() == "orthographic")
+          ray_tracer.observer.projection = orthographic_projection<scalar_type> {1, aspect_ratio};
       }
 
-      const auto& perspective          = request.perspective();
-      auto&       cast_projection      = std::get<perspective_projection<scalar_type>>(ray_tracer.observer.projection);
-
-      if (perspective.has_y_field_of_view())
-        cast_projection.fov_y          = perspective.y_field_of_view();
-      if (perspective.has_focal_length   ())
-        cast_projection.focal_length   = perspective.focal_length   ();
-      if (perspective.has_near_clip      ())
-        cast_projection.near_clip      = perspective.near_clip      ();
-      if (perspective.has_far_clip       ())
-        cast_projection.far_clip       = perspective.far_clip       ();
-    }
-
-    if (request.has_orthographic    ())
-    {
-      if (!std::holds_alternative<orthographic_projection<scalar_type>>(ray_tracer.observer.projection))
+      if      (std::holds_alternative<perspective_projection <scalar_type>>(ray_tracer.observer.projection))
       {
-        const auto& image_size         = ray_tracer.partitioner.domain_size();
-        const auto  aspect_ratio       = static_cast<scalar_type>(image_size[0]) / static_cast<scalar_type>(image_size[1]);
-        ray_tracer.observer.projection = orthographic_projection<scalar_type> {1, aspect_ratio};
-      }
+        auto& cast_projection = std::get<perspective_projection<scalar_type>>(ray_tracer.observer.projection);
 
-      const auto& perspective          = request.orthographic();
-      auto&       cast_projection      = std::get<orthographic_projection<scalar_type>>(ray_tracer.observer.projection);
+        if (request.has_image_size())
+          cast_projection.aspect_ratio = aspect_ratio;
+        if (projection.has_y_field_of_view())
+          cast_projection.fov_y        = to_radians(projection.y_field_of_view());
+        if (projection.has_focal_length   ())
+          cast_projection.focal_length = projection.focal_length   ();
+        if (projection.has_near_clip      ())
+          cast_projection.near_clip    = projection.near_clip      ();
+        if (projection.has_far_clip       ())
+          cast_projection.far_clip     = projection.far_clip       ();
+      }
+      else if (std::holds_alternative<orthographic_projection<scalar_type>>(ray_tracer.observer.projection))
+      {
+        auto& cast_projection = std::get<orthographic_projection<scalar_type>>(ray_tracer.observer.projection);
       
-      if (perspective.has_height   ())
-        cast_projection.height         = perspective.height   ();
-      if (perspective.has_near_clip())
-        cast_projection.near_clip      = perspective.near_clip();
-      if (perspective.has_far_clip ())
-        cast_projection.far_clip       = perspective.far_clip ();
+        if (request.has_image_size())
+          cast_projection.aspect_ratio = aspect_ratio;
+        if (projection.has_height         ())
+          cast_projection.height       = projection.height         ();
+        if (projection.has_near_clip      ())
+          cast_projection.near_clip    = projection.near_clip      ();
+        if (projection.has_far_clip       ())
+          cast_projection.far_clip     = projection.far_clip       ();
+      }
     }
 
     if (request.has_background_image())

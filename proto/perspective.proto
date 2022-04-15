@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-message perspective
-{
-	optional float y_field_of_view = 1;
-	optional float focal_length    = 2;
-	optional float near_clip       = 3;
-	optional float far_clip        = 4;
-}

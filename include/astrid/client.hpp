@@ -1,10 +1,9 @@
 #pragma once
 
 #include <atomic>
-#include <condition_variable>
 #include <cstdint>
+#include <functional>
 #include <future>
-#include <mutex>
 #include <string>
 
 #include <QObject>
@@ -20,57 +19,54 @@ class client : public QObject
   Q_OBJECT
 
 public:
-  explicit client  (const std::string& address = "127.0.0.1:3000", const std::int32_t timeout_ms = 5000);
+  explicit client  (
+    const std::function<void(request&)>&     on_request ,
+    const std::function<void(const image&)>& on_response,
+    const std::function<void()>&             on_finalize,
+    const std::string&                       address    = "127.0.0.1:3000", 
+    std::int32_t                             timeout_ms = 5000);
   client           (const client&  that) = delete;
   client           (      client&& temp) = delete;
-  virtual ~client  ();
+ ~client           () override;
   client& operator=(const client&  that) = delete;
   client& operator=(      client&& temp) = delete;
   
-  void         make_request       ()
-  {
-    request_once_ = true;
-  }
-  void         set_auto_request   (const bool auto_request)
-  {
-    request_auto_ = auto_request;
-  }
-  void         kill               ()
+  void kill                ()
   {
     alive_ = false;
   }
-
-  request&     request_data       ()
+  void make_request        ()
   {
-    return request_data_;
+    request_once_ = true;
   }
-  std::condition_variable& request_cv()
+  void set_auto_request    (const bool auto_request)
   {
-    return request_cv_;
+    request_auto_ = auto_request;
   }
-  const image& response_data      () const
-  {
-    return response_data_;
-  }
-
-signals:
-  void         on_send_request    ();
-  void         on_receive_response();
-  void         on_finalize        ();
   
+signals:
+  void on_request_internal ();
+  void on_response_internal();
+  void on_finalize_internal();
+
 protected:
-  zmq::context_t          context_      {1};
-  zmq::socket_t           socket_       {context_, ZMQ_PAIR};
-  std::string             address_      ;
-                          
-  std::future<void>       future_       ;
-  std::atomic_bool        alive_        {true};
-                          
-  std::atomic_bool        request_once_ ;
-  std::atomic_bool        request_auto_ ;
-  ::request               request_data_ ;
-  ::image                 response_data_;
-  std::mutex              request_mutex_;
-  std::condition_variable request_cv_   ;
+  zmq::context_t                    context_       {1};
+  zmq::socket_t                     socket_        {context_, ZMQ_PAIR};
+  
+  std::function<void(request&)>     on_request_    ;
+  std::function<void(const image&)> on_response_   ;
+  std::function<void()>             on_finalize_   ;
+                                   
+  std::future<void>                 future_        ;
+  std::atomic_bool                  alive_         {true};
+  std::atomic_bool                  request_once_  ;
+  std::atomic_bool                  request_auto_  ;
+  
+  request                           request_data_  ;
+  std::mutex                        request_mutex_ ;
+  std::condition_variable           request_cv_    ;
+  image                             response_data_ ;
+  std::mutex                        response_mutex_;
+  std::condition_variable           response_cv_   ;
 };
 }

@@ -1,9 +1,7 @@
-# astrid
+### Astrid
 A relativistic ray tracing server and end-user application built on Astray.
 
-// TODO:
-- +1 -1 for position, rotation, bounds.
-- Clean up client condition variable.
-- Server does not ever reset bounds.
-- A metric change invalidates all parameters, including the background image and bounds.
-- Interaction.
+### Next Steps
+- Fix: Window: A metric change invalidates all parameters. When bounds are selected off, send empty AABB4 once.
+- Implement: Keyboard + mouse interaction.
+- Implement: Increment / decrement for position, rotation and bounds.

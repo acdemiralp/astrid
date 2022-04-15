@@ -27,11 +27,14 @@ public:
   void mouseMoveEvent   (QMouseEvent* event) override;
   
 protected:
-  ast::window*                      window_   ;
+  ast::window*                      window_             ;
 
-  std::unique_ptr<QTimer>           timer_    ;
-  std::unordered_map<Qt::Key, bool> key_map_  ;
-  bool                              dragging_ ;
-  transform<float>                  transform_;
+  std::unique_ptr<QTimer>           timer_              ;
+  std::unordered_map<Qt::Key, bool> key_map_            ;
+  transform<float>                  transform_          ;
+
+  float                             move_speed_         = 0.001f;
+  float                             look_speed_         = 0.1f ;
+  QPoint                            last_mouse_position_;
 };
 }

@@ -18,8 +18,8 @@ server::server(const std::int32_t port)
 
 void server::run   ()
 {
-  request                   request     ;
-  ::image                   response    ;
+  proto::request            request     ;
+  proto::image              response    ;
   std::int32_t              message_size;
   std::vector<std::uint8_t> message_data;
   image_type                image       ;
@@ -57,7 +57,7 @@ void server::run   ()
   }
 }
 
-void server::update(const request& request)
+void server::update(const proto::request& request)
 {
   if (request.has_metric())
   {

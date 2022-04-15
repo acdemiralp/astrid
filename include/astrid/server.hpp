@@ -38,7 +38,7 @@ public:
   void run   ();
 
 protected:
-  void update(const request& request);
+  void update(const proto::request& request);
 
   mpi::environment  environment_ ;
   mpi::communicator communicator_;

@@ -7,11 +7,11 @@
 namespace ast
 {
 client::client (
-  const std::function<void(request&)>&     on_request ,
-  const std::function<void(const image&)>& on_response,
-  const std::function<void()>&             on_finalize,
-  const std::string&                       address    , 
-  const std::int32_t                       timeout_ms )
+  const std::function<void(proto::request&)>&     on_request ,
+  const std::function<void(const proto::image&)>& on_response,
+  const std::function<void()>&                    on_finalize,
+  const std::string&                              address    , 
+  const std::int32_t                              timeout_ms )
 : on_request_(on_request), on_response_(on_response), on_finalize_(on_finalize)
 {
   zmq::monitor_t monitor;

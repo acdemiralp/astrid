@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include <astray/api.hpp>
 #include <QMainWindow>
 #include <QWidget>
 
@@ -23,9 +24,10 @@ private:
   void create_client    (const std::string& address = "127.0.0.1:3000");
   void destroy_client   ();
 
-  void fill_request_data(request& request);
+  void fill_request_data(proto::request& request);
 
-  std::unique_ptr<Ui::main_window> ui_    ;
-  std::unique_ptr<client>          client_;
+  std::unique_ptr<Ui::main_window> ui_        ;
+  std::unique_ptr<client>          client_    ;
+  image<vector3<std::uint8_t>>     background_;
 };
 }

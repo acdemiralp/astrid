@@ -6,6 +6,8 @@ import "image.proto";
 import "projection.proto";
 import "transform.proto";
 
+package proto;
+
 message request 
 {
 	optional string     metric                      = 1;

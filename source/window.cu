@@ -1,6 +1,5 @@
 #include <astrid/window.hpp>
 
-#include <astray/api.hpp>
 #include <QString>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -12,7 +11,7 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
 {
   ui_->setupUi(this);
   
-  resize(1023, 512);
+  resize(1024, 512);
   
   connect(ui_->action_connect_local          , &QAction    ::triggered         , this, [&] 
   {
@@ -158,7 +157,11 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
       "Images (*.bmp *.jpg *.png *.tga)");
 
     if (!filepath.isNull())
-      ui_->line_edit_background->setText(filepath);
+    {
+      const auto line_edit = ui_->line_edit_background;
+      line_edit->setText(filepath);
+      background_.load(line_edit->text().toStdString());
+    }
   });
   connect(ui_->button_render                 , &QPushButton::clicked           , this, [&]
   {
@@ -198,8 +201,14 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
   {
     const bool is_perspective = text == "perspective";
     ui_->line_edit_fov_y       ->setEnabled( is_perspective);
+    ui_->button_fov_y_05       ->setEnabled( is_perspective);
+    ui_->button_fov_y_2        ->setEnabled( is_perspective);
     ui_->line_edit_focal_length->setEnabled( is_perspective);
+    ui_->button_focal_length_05->setEnabled( is_perspective);
+    ui_->button_focal_length_2 ->setEnabled( is_perspective);
     ui_->line_edit_size_ortho  ->setEnabled(!is_perspective);
+    ui_->button_size_ortho_05  ->setEnabled(!is_perspective);
+    ui_->button_size_ortho_2   ->setEnabled(!is_perspective);
   });
    
   statusBar()->showMessage("Initialization successful.");
@@ -222,13 +231,13 @@ void window::create_client    (const std::string& address)
   try
   {
     client_ = std::make_unique<client>(
-      [&] (request& request_data)
+      [&] (proto::request& request_data)
       {
         statusBar()->showMessage("Sending render request to the server. Please wait.");
         
         fill_request_data(request_data);
       },
-      [&] (const ::image& response_data)
+      [&] (const proto::image& response_data)
       {
         statusBar()->showMessage("Received image from the server.");
 
@@ -264,7 +273,7 @@ void window::destroy_client   ()
   client_->kill();
 }
 
-void window::fill_request_data(request& request)
+void window::fill_request_data(proto::request& request)
 {
   // Always set parameters.
   request.mutable_image_size       ()->set_x(ui_->image->width () - 2 * ui_->image->frameWidth());
@@ -330,12 +339,9 @@ void window::fill_request_data(request& request)
        ui_->combobox_metric->currentText() != cached_metric || // TODO: Horrid. A metric change invalidates all parameters.
        ui_->line_edit_background->text() != cached_background)
   {
-    image<vector3<std::uint8_t>> image;
-    image.load(ui_->line_edit_background->text().toStdString());
-    
-    request.mutable_background_image()->set_data(static_cast<void*>(image.data.data()), image.data.size() * sizeof(vector3<std::uint8_t>));
-    request.mutable_background_image()->mutable_size()->set_x(image.size[0]);
-    request.mutable_background_image()->mutable_size()->set_y(image.size[1]);
+    request.mutable_background_image()->set_data(static_cast<void*>(background_.data.data()), background_.data.size() * sizeof(vector3<std::uint8_t>));
+    request.mutable_background_image()->mutable_size()->set_x(background_.size[0]);
+    request.mutable_background_image()->mutable_size()->set_y(background_.size[1]);
 
     cached_background = ui_->line_edit_background->text();
   }

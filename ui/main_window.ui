@@ -65,7 +65,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>568</width>
+             <width>570</width>
              <height>423</height>
             </rect>
            </property>
@@ -395,7 +395,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>568</width>
+             <width>570</width>
              <height>423</height>
             </rect>
            </property>
@@ -903,7 +903,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QLabel" name="image">
+      <widget class="ast::view" name="image">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>3</horstretch>
@@ -982,6 +982,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ast::view</class>
+   <extends>QLabel</extends>
+   <header>astrid/view.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

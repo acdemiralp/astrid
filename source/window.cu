@@ -8,7 +8,7 @@
 
 namespace ast
 {
-window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window), timer_(std::make_unique<QTimer>(this))
+window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
 {
   ui_->setupUi(this);
   
@@ -212,41 +212,7 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window),
     ui_->button_size_ortho_2   ->setEnabled(!is_perspective);
   });
    
-  connect(timer_.get(), &QTimer::timeout, this, [&]
-  {
-    if (key_map_[Qt::Key_D]) ui_->line_edit_position_x->setText(QString::number(ui_->line_edit_position_x->text().toFloat() + 0.1));
-    if (key_map_[Qt::Key_A]) ui_->line_edit_position_x->setText(QString::number(ui_->line_edit_position_x->text().toFloat() - 0.1));
-    if (key_map_[Qt::Key_E]) ui_->line_edit_position_y->setText(QString::number(ui_->line_edit_position_y->text().toFloat() + 0.1));
-    if (key_map_[Qt::Key_Q]) ui_->line_edit_position_y->setText(QString::number(ui_->line_edit_position_y->text().toFloat() - 0.1));
-    if (key_map_[Qt::Key_W]) ui_->line_edit_position_z->setText(QString::number(ui_->line_edit_position_z->text().toFloat() + 0.1));
-    if (key_map_[Qt::Key_S]) ui_->line_edit_position_z->setText(QString::number(ui_->line_edit_position_z->text().toFloat() - 0.1));
-  });
-  timer_->start(16);
-
   statusBar()->showMessage("Initialization successful.");
-}
-
-void window::keyPressEvent    (QKeyEvent* event)
-{
-  QMainWindow::keyPressEvent(event);
-
-  if (event->key() == Qt::Key_W) key_map_[Qt::Key_W] = true;
-  if (event->key() == Qt::Key_A) key_map_[Qt::Key_A] = true;
-  if (event->key() == Qt::Key_S) key_map_[Qt::Key_S] = true;
-  if (event->key() == Qt::Key_D) key_map_[Qt::Key_D] = true;
-  if (event->key() == Qt::Key_Q) key_map_[Qt::Key_Q] = true;
-  if (event->key() == Qt::Key_E) key_map_[Qt::Key_E] = true;
-}
-void window::keyReleaseEvent  (QKeyEvent* event)
-{
-  QMainWindow::keyReleaseEvent(event);
-  
-  if (event->key() == Qt::Key_W) key_map_[Qt::Key_W] = false;
-  if (event->key() == Qt::Key_A) key_map_[Qt::Key_A] = false;
-  if (event->key() == Qt::Key_S) key_map_[Qt::Key_S] = false;
-  if (event->key() == Qt::Key_D) key_map_[Qt::Key_D] = false;
-  if (event->key() == Qt::Key_Q) key_map_[Qt::Key_Q] = false;
-  if (event->key() == Qt::Key_E) key_map_[Qt::Key_E] = false;
 }
 
 void window::set_ui_state     (const bool connected) const

@@ -1,11 +1,9 @@
 #pragma once
 
 #include <memory>
-#include <unordered_map>
 
 #include <astray/api.hpp>
 #include <QMainWindow>
-#include <QTimer>
 #include <QWidget>
 
 #include <astrid/client.hpp>
@@ -20,8 +18,7 @@ class window : public QMainWindow
 public:
   explicit window(QWidget* parent = nullptr);
 
-  void keyPressEvent  (QKeyEvent* event) override;
-  void keyReleaseEvent(QKeyEvent* event) override;
+  Ui::main_window* ui() const { return ui_.get(); }
 
 private:
   void set_ui_state     (bool connected) const;
@@ -31,11 +28,8 @@ private:
 
   void fill_request_data(proto::request& request);
 
-  std::unique_ptr<Ui::main_window>  ui_        ;
-  std::unique_ptr<client>           client_    ;
-  image<vector3<std::uint8_t>>      background_;
-
-  std::unique_ptr<QTimer>           timer_     ;
-  std::unordered_map<Qt::Key, bool> key_map_   ;
+  std::unique_ptr<Ui::main_window> ui_        ;
+  std::unique_ptr<client>          client_    ;
+  image<vector3<std::uint8_t>>     background_;
 };
 }

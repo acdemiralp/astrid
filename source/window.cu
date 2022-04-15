@@ -12,7 +12,7 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
 {
   ui_->setupUi(this);
   
-  resize(1024, 600);
+  resize(1023, 512);
   
   connect(ui_->action_connect_local          , &QAction    ::triggered         , this, [&] 
   {
@@ -231,12 +231,13 @@ void window::create_client    (const std::string& address)
       [&] (const ::image& response_data)
       {
         statusBar()->showMessage("Received image from the server.");
-      
+
         ui_->image->setPixmap(QPixmap::fromImage(QImage(
-          reinterpret_cast<const unsigned char*>(response_data.data().c_str()),
+          reinterpret_cast<const unsigned char*>(response_data.data().data()),
           response_data.size().x(),
           response_data.size().y(),
-          QImage::Format_RGB888))); // TODO: QImage bugs out for certain x, y.
+          response_data.size().x() * sizeof(vector3<std::uint8_t>),
+          QImage::Format_RGB888)));
 
         if(!ui_->checkbox_autorender->isChecked())
           ui_->button_render->setEnabled(true);
@@ -293,22 +294,6 @@ void window::fill_request_data(request& request)
   else
     request.clear_metric();
   
-  if (ui_->combobox_projection_type->currentText() == "perspective")
-  {
-    request.clear_orthographic  ();
-    request.mutable_perspective ()->set_y_field_of_view(ui_->line_edit_fov_y       ->text().toFloat());
-    request.mutable_perspective ()->set_focal_length   (ui_->line_edit_focal_length->text().toFloat());
-    request.mutable_perspective ()->set_near_clip      (ui_->line_edit_near_clip   ->text().toFloat());
-    request.mutable_perspective ()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
-  }
-  else
-  {
-    request.clear_perspective   ();
-    request.mutable_orthographic()->set_height         (ui_->line_edit_size_ortho  ->text().toFloat());
-    request.mutable_orthographic()->set_near_clip      (ui_->line_edit_near_clip   ->text().toFloat());
-    request.mutable_orthographic()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
-  }
-
   if (ui_->checkbox_use_bounds->isChecked())
   {
     request.mutable_bounds()->mutable_lower()->set_t(ui_->line_edit_lower_bound_t->text().toFloat());
@@ -325,18 +310,18 @@ void window::fill_request_data(request& request)
 
   if (ui_->combobox_projection_type->currentText() == "perspective")
   {
-    request.clear_orthographic  ();
-    request.mutable_perspective ()->set_y_field_of_view(ui_->line_edit_fov_y       ->text().toFloat());
-    request.mutable_perspective ()->set_focal_length   (ui_->line_edit_focal_length->text().toFloat());
-    request.mutable_perspective ()->set_near_clip      (ui_->line_edit_near_clip   ->text().toFloat());
-    request.mutable_perspective ()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
+    request.mutable_projection()->set_type           ("perspective");
+    request.mutable_projection()->set_y_field_of_view(ui_->line_edit_fov_y       ->text().toFloat());
+    request.mutable_projection()->set_focal_length   (ui_->line_edit_focal_length->text().toFloat());
+    request.mutable_projection()->set_near_clip      (ui_->line_edit_near_clip   ->text().toFloat());
+    request.mutable_projection()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
   }
   else
   {
-    request.clear_perspective   ();
-    request.mutable_orthographic()->set_height         (ui_->line_edit_size_ortho  ->text().toFloat());
-    request.mutable_orthographic()->set_near_clip      (ui_->line_edit_near_clip   ->text().toFloat());
-    request.mutable_orthographic()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
+    request.mutable_projection()->set_type           ("orthographic");
+    request.mutable_projection()->set_height         (ui_->line_edit_size_ortho  ->text().toFloat());
+    request.mutable_projection()->set_near_clip      (ui_->line_edit_near_clip   ->text().toFloat());
+    request.mutable_projection()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
   }
 
   static QString cached_background;

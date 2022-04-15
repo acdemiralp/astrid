@@ -52,7 +52,7 @@
            <enum>QFrame::Box</enum>
           </property>
           <property name="lineWidth">
-           <number>1</number>
+           <number>2</number>
           </property>
           <property name="currentIndex">
            <number>0</number>
@@ -65,8 +65,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>570</width>
-             <height>427</height>
+             <width>568</width>
+             <height>423</height>
             </rect>
            </property>
            <attribute name="label">
@@ -395,8 +395,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>570</width>
-             <height>427</height>
+             <width>568</width>
+             <height>423</height>
             </rect>
            </property>
            <attribute name="label">
@@ -575,7 +575,7 @@
                 <item>
                  <widget class="QLineEdit" name="line_edit_position_z">
                   <property name="text">
-                   <string>-5.0</string>
+                   <string>-10.0</string>
                   </property>
                  </widget>
                 </item>
@@ -620,7 +620,7 @@
                 <item>
                  <widget class="QLineEdit" name="line_edit_fov_y">
                   <property name="text">
-                   <string>60.0</string>
+                   <string>75.0</string>
                   </property>
                  </widget>
                 </item>
@@ -864,6 +864,9 @@
           <property name="frameShadow">
            <enum>QFrame::Plain</enum>
           </property>
+          <property name="lineWidth">
+           <number>2</number>
+          </property>
           <layout class="QGridLayout" name="gridLayout">
            <item row="0" column="0">
             <layout class="QHBoxLayout" name="layout_render">
@@ -920,7 +923,7 @@
         <enum>QFrame::Box</enum>
        </property>
        <property name="lineWidth">
-        <number>1</number>
+        <number>2</number>
        </property>
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>

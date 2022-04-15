@@ -337,28 +337,29 @@ void window::fill_request_data(proto::request& request)
   }
 
   // Conditional parameters.
-  static QString cached_metric;
-  if (ui_->combobox_metric->currentText() != cached_metric)
-  {
-    *request.mutable_metric() = ui_->combobox_metric->currentText().toStdString();
-    cached_metric = ui_->combobox_metric->currentText();
-  }
-  else
-    request.clear_metric();
-  
-  static QString cached_background;
-  if (!ui_->line_edit_background->text().isNull () &&
-      !ui_->line_edit_background->text().isEmpty() &&
-       ui_->combobox_metric->currentText() != cached_metric ||
-       ui_->line_edit_background->text() != cached_background)
-  {
-    request.mutable_background_image()->set_data(static_cast<void*>(background_.data.data()), background_.data.size() * sizeof(vector3<std::uint8_t>));
-    request.mutable_background_image()->mutable_size()->set_x(background_.size[0]);
-    request.mutable_background_image()->mutable_size()->set_y(background_.size[1]);
+  static QString cached_background, cached_metric;
 
+  if (!ui_->line_edit_background->text       ().isNull () &&
+      !ui_->line_edit_background->text       ().isEmpty() &&
+       ui_->combobox_metric     ->currentText() != cached_metric ||
+       ui_->line_edit_background->text       () != cached_background)
+  {
+    const auto image = request.mutable_background_image();
+    image->set_data(static_cast<void*>(background_.data.data()), background_.data.size() * sizeof(vector3<std::uint8_t>));
+    image->mutable_size()->set_x(background_.size[0]);
+    image->mutable_size()->set_y(background_.size[1]);
     cached_background = ui_->line_edit_background->text();
   }
   else
     request.clear_background_image();
+    
+  if (ui_->combobox_metric->currentText() != cached_metric)
+  {
+    const auto text = ui_->combobox_metric->currentText();
+    *request.mutable_metric() = text.toStdString();
+    cached_metric = text;
+  }
+  else
+    request.clear_metric();
 }
 }

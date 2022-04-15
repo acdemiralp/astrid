@@ -276,24 +276,67 @@ void window::destroy_client   ()
 void window::fill_request_data(proto::request& request)
 {
   // Always set parameters.
-  request.mutable_image_size       ()->set_x(ui_->image->width () - 2 * ui_->image->frameWidth());
-  request.mutable_image_size       ()->set_y(ui_->image->height() - 2 * ui_->image->frameWidth());
-  request.set_iterations           (ui_->line_edit_iterations      ->text().toULongLong());
-  request.set_lambda_step_size     (ui_->line_edit_lambda_step_size->text().toFloat    ());
-  request.set_lambda               (ui_->line_edit_lambda          ->text().toFloat    ());
-  request.set_debug                (ui_->checkbox_debug            ->isChecked());
+  {
+    request.mutable_image_size       ()->set_x(ui_->image->width () - 2 * ui_->image->frameWidth  ());
+    request.mutable_image_size       ()->set_y(ui_->image->height() - 2 * ui_->image->frameWidth  ());
+    request.set_iterations           (         ui_->line_edit_iterations      ->text().toULongLong());
+    request.set_lambda_step_size     (         ui_->line_edit_lambda_step_size->text().toFloat    ());
+    request.set_lambda               (         ui_->line_edit_lambda          ->text().toFloat    ());
+    request.set_debug                (         ui_->checkbox_debug            ->isChecked         ());
+    
+    if (ui_->checkbox_use_bounds->isChecked())
+    {
+      request.mutable_bounds()->mutable_lower()->set_t(ui_->line_edit_lower_bound_t->text().toFloat());
+      request.mutable_bounds()->mutable_lower()->set_x(ui_->line_edit_lower_bound_x->text().toFloat());
+      request.mutable_bounds()->mutable_lower()->set_y(ui_->line_edit_lower_bound_y->text().toFloat());
+      request.mutable_bounds()->mutable_lower()->set_z(ui_->line_edit_lower_bound_z->text().toFloat());
+      request.mutable_bounds()->mutable_upper()->set_t(ui_->line_edit_upper_bound_t->text().toFloat());
+      request.mutable_bounds()->mutable_upper()->set_x(ui_->line_edit_upper_bound_x->text().toFloat());
+      request.mutable_bounds()->mutable_upper()->set_y(ui_->line_edit_upper_bound_y->text().toFloat());
+      request.mutable_bounds()->mutable_upper()->set_z(ui_->line_edit_upper_bound_z->text().toFloat());
+    }
+    else
+    {
+      aabb4<float> empty_aabb;
+      request.mutable_bounds()->mutable_lower()->set_t(empty_aabb.min()[0]);
+      request.mutable_bounds()->mutable_lower()->set_x(empty_aabb.min()[1]);
+      request.mutable_bounds()->mutable_lower()->set_y(empty_aabb.min()[2]);
+      request.mutable_bounds()->mutable_lower()->set_z(empty_aabb.min()[3]);
+      request.mutable_bounds()->mutable_upper()->set_t(empty_aabb.max()[0]);
+      request.mutable_bounds()->mutable_upper()->set_x(empty_aabb.max()[1]);
+      request.mutable_bounds()->mutable_upper()->set_y(empty_aabb.max()[2]);
+      request.mutable_bounds()->mutable_upper()->set_z(empty_aabb.max()[3]);
+    }
 
-  const auto transform = request.mutable_transform();
-  transform->set_time              (         ui_->line_edit_coordinate_time->text().toFloat());
-  transform->mutable_position      ()->set_x(ui_->line_edit_position_x     ->text().toFloat());
-  transform->mutable_position      ()->set_y(ui_->line_edit_position_y     ->text().toFloat());
-  transform->mutable_position      ()->set_z(ui_->line_edit_position_z     ->text().toFloat());
-  transform->mutable_rotation_euler()->set_x(ui_->line_edit_rotation_x     ->text().toFloat());
-  transform->mutable_rotation_euler()->set_y(ui_->line_edit_rotation_y     ->text().toFloat());
-  transform->mutable_rotation_euler()->set_z(ui_->line_edit_rotation_z     ->text().toFloat());
-  transform->set_look_at_origin    (         ui_->checkbox_look_at_origin  ->isChecked());
-  
-  // TODO: Ideally only set the values that have changed.
+    const auto transform = request.mutable_transform();
+    transform->set_time              (         ui_->line_edit_coordinate_time ->text().toFloat    ());
+    transform->mutable_position      ()->set_x(ui_->line_edit_position_x      ->text().toFloat    ());
+    transform->mutable_position      ()->set_y(ui_->line_edit_position_y      ->text().toFloat    ());
+    transform->mutable_position      ()->set_z(ui_->line_edit_position_z      ->text().toFloat    ());
+    transform->mutable_rotation_euler()->set_x(ui_->line_edit_rotation_x      ->text().toFloat    ());
+    transform->mutable_rotation_euler()->set_y(ui_->line_edit_rotation_y      ->text().toFloat    ());
+    transform->mutable_rotation_euler()->set_z(ui_->line_edit_rotation_z      ->text().toFloat    ());
+    transform->set_look_at_origin    (         ui_->checkbox_look_at_origin   ->isChecked         ());
+
+    request.mutable_projection()->set_type(ui_->combobox_projection_type->currentText().toStdString());
+
+    if      (ui_->combobox_projection_type->currentText() == "perspective" )
+    {
+      request.mutable_projection()->set_y_field_of_view(ui_->line_edit_fov_y       ->text().toFloat());
+      request.mutable_projection()->set_focal_length   (ui_->line_edit_focal_length->text().toFloat());
+      request.mutable_projection()->set_near_clip      (ui_->line_edit_near_clip   ->text().toFloat());
+      request.mutable_projection()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
+    }
+    else if (ui_->combobox_projection_type->currentText() == "orthographic")
+    {
+      request.mutable_projection()->set_type           ("orthographic");
+      request.mutable_projection()->set_height         (ui_->line_edit_size_ortho  ->text().toFloat());
+      request.mutable_projection()->set_near_clip      (ui_->line_edit_near_clip   ->text().toFloat());
+      request.mutable_projection()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
+    }
+  }
+
+  // Conditional parameters.
   static QString cached_metric;
   if (ui_->combobox_metric->currentText() != cached_metric)
   {
@@ -303,40 +346,10 @@ void window::fill_request_data(proto::request& request)
   else
     request.clear_metric();
   
-  if (ui_->checkbox_use_bounds->isChecked())
-  {
-    request.mutable_bounds()->mutable_lower()->set_t(ui_->line_edit_lower_bound_t->text().toFloat());
-    request.mutable_bounds()->mutable_lower()->set_x(ui_->line_edit_lower_bound_x->text().toFloat());
-    request.mutable_bounds()->mutable_lower()->set_y(ui_->line_edit_lower_bound_y->text().toFloat());
-    request.mutable_bounds()->mutable_lower()->set_z(ui_->line_edit_lower_bound_z->text().toFloat());
-    request.mutable_bounds()->mutable_upper()->set_t(ui_->line_edit_upper_bound_t->text().toFloat());
-    request.mutable_bounds()->mutable_upper()->set_x(ui_->line_edit_upper_bound_x->text().toFloat());
-    request.mutable_bounds()->mutable_upper()->set_y(ui_->line_edit_upper_bound_y->text().toFloat());
-    request.mutable_bounds()->mutable_upper()->set_z(ui_->line_edit_upper_bound_z->text().toFloat());
-  }
-  else
-    request.clear_bounds();
-
-  if (ui_->combobox_projection_type->currentText() == "perspective")
-  {
-    request.mutable_projection()->set_type           ("perspective");
-    request.mutable_projection()->set_y_field_of_view(ui_->line_edit_fov_y       ->text().toFloat());
-    request.mutable_projection()->set_focal_length   (ui_->line_edit_focal_length->text().toFloat());
-    request.mutable_projection()->set_near_clip      (ui_->line_edit_near_clip   ->text().toFloat());
-    request.mutable_projection()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
-  }
-  else
-  {
-    request.mutable_projection()->set_type           ("orthographic");
-    request.mutable_projection()->set_height         (ui_->line_edit_size_ortho  ->text().toFloat());
-    request.mutable_projection()->set_near_clip      (ui_->line_edit_near_clip   ->text().toFloat());
-    request.mutable_projection()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
-  }
-
   static QString cached_background;
   if (!ui_->line_edit_background->text().isNull () &&
       !ui_->line_edit_background->text().isEmpty() &&
-       ui_->combobox_metric->currentText() != cached_metric || // TODO: Horrid. A metric change invalidates all parameters.
+       ui_->combobox_metric->currentText() != cached_metric ||
        ui_->line_edit_background->text() != cached_background)
   {
     request.mutable_background_image()->set_data(static_cast<void*>(background_.data.data()), background_.data.size() * sizeof(vector3<std::uint8_t>));

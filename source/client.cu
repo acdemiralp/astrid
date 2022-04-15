@@ -20,9 +20,10 @@ client::client (const std::string& address, const std::int32_t timeout_ms) : add
       {
         if (request_once_)
           request_once_ = false;
-        
+
+        std::unique_lock lock(request_mutex_);
         emit on_send_request();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Horrid.
+        request_cv_.wait(lock);
 
         auto string = request_data_.SerializeAsString();
 

@@ -15,11 +15,11 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
   setWindowTitle("Astrid");
   resize        (1024, 600);
   
-  connect(ui_->action_connect_local          , &QAction::triggered             , this, [&] 
+  connect(ui_->action_connect_local          , &QAction    ::triggered         , this, [&] 
   {
     create_client();
   });
-  connect(ui_->action_connect_remote         , &QAction::triggered             , this, [&] 
+  connect(ui_->action_connect_remote         , &QAction    ::triggered         , this, [&] 
   {
     bool confirm;
     const auto address = QInputDialog::getText(
@@ -33,31 +33,15 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
     if (confirm)
       create_client(address.toStdString());
   });
-  connect(ui_->action_disconnect             , &QAction::triggered             , this, [&] 
+  connect(ui_->action_disconnect             , &QAction    ::triggered         , this, [&] 
   {
     destroy_client();
   });
-  connect(ui_->action_exit                   , &QAction::triggered             , this, [&] 
+  connect(ui_->action_exit                   , &QAction    ::triggered         , this, [&] 
   {
     std::exit(0);
   });
   
-  connect(ui_->button_render                 , &QPushButton::clicked           , this, [&]
-  {
-    if (client_)
-    {
-      client_->make_request();
-      ui_->button_render->setEnabled(false);
-    }
-  });
-  connect(ui_->checkbox_autorender           , &QCheckBox  ::stateChanged      , this, [&] (const std::int32_t checked)
-  {
-    if (client_)
-      client_->set_auto_request(ui_->checkbox_autorender->isChecked());
-
-    ui_->button_render->setEnabled(!checked);
-  });
-
   connect(ui_->button_iterations_05          , &QPushButton::clicked           , this, [&]
   {
     const auto line_edit = ui_->line_edit_iterations;
@@ -94,7 +78,6 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
     const auto value     = line_edit->text().toFloat() + 1;
     line_edit->setText(QString::number(value));
   });
-  
   connect(ui_->button_coordinate_time_minus_1, &QPushButton::clicked           , this, [&]
   {
     const auto line_edit = ui_->line_edit_coordinate_time;
@@ -167,7 +150,33 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
     const auto value     = line_edit->text().toFloat() * 2;
     line_edit->setText(QString::number(value));
   });
+  connect(ui_->button_background_browse      , &QPushButton::clicked           , this, [&]
+  {
+    const QString filepath = QFileDialog::getOpenFileName(
+      this, 
+      "Select background image file.",
+      QString(),
+      "Images (*.bmp *.jpg *.png *.tga)");
+
+    if (!filepath.isNull())
+      ui_->line_edit_background->setText(filepath);
+  });
+  connect(ui_->button_render                 , &QPushButton::clicked           , this, [&]
+  {
+    if (client_)
+    {
+      client_->make_request();
+      ui_->button_render->setEnabled(false);
+    }
+  });
   
+  connect(ui_->checkbox_autorender           , &QCheckBox  ::stateChanged      , this, [&] (const std::int32_t checked)
+  {
+    if (client_)
+      client_->set_auto_request(ui_->checkbox_autorender->isChecked());
+
+    ui_->button_render->setEnabled(!checked);
+  });
   connect(ui_->checkbox_use_bounds           , &QCheckBox  ::stateChanged      , this, [&] (const std::int32_t checked)
   {
     ui_->line_edit_lower_bound_t->setEnabled(checked);
@@ -184,18 +193,6 @@ window::window(QWidget* parent) : QMainWindow(parent), ui_(new Ui::main_window)
     ui_->line_edit_rotation_x   ->setEnabled(!checked);
     ui_->line_edit_rotation_y   ->setEnabled(!checked);
     ui_->line_edit_rotation_z   ->setEnabled(!checked);
-  });
-
-  connect(ui_->button_background_browse      , &QPushButton::clicked           , this, [&]
-  {
-    const QString filepath = QFileDialog::getOpenFileName(
-      this, 
-      "Select background image file.",
-      QString(),
-      "Images (*.bmp *.jpg *.png *.tga)");
-
-    if (!filepath.isNull())
-      ui_->line_edit_background->setText(filepath);
   });
   
   connect(ui_->combobox_projection_type      , &QComboBox  ::currentTextChanged, this, [&] (const QString& text)
@@ -227,8 +224,14 @@ void window::create_client (const std::string& address)
       auto& request = client_->request_data();
 
       // TODO: Ideally only set the values that have changed.
-      auto metric_name = ui_->combobox_metric->currentText().toStdString();
-      *request.mutable_metric     () = ui_->combobox_metric->currentText().toStdString();
+      static QString cached_metric;
+      if (ui_->combobox_metric->currentText() != cached_metric)
+      {
+        *request.mutable_metric() = ui_->combobox_metric->currentText().toStdString();
+        cached_metric = ui_->combobox_metric->currentText();
+      }
+      else
+        request.clear_metric();
 
       request.mutable_image_size  ()->set_x((ui_->image->width () / 2) * 2 - 2 * ui_->image->frameWidth());
       request.mutable_image_size  ()->set_y((ui_->image->height() / 2) * 2 - 2 * ui_->image->frameWidth());
@@ -277,8 +280,11 @@ void window::create_client (const std::string& address)
         request.mutable_orthographic()->set_far_clip       (ui_->line_edit_far_clip    ->text().toFloat());
       }
 
+      static QString cached_background;
       if (!ui_->line_edit_background->text().isNull () &&
-          !ui_->line_edit_background->text().isEmpty())
+          !ui_->line_edit_background->text().isEmpty() &&
+           ui_->combobox_metric->currentText() != cached_metric || // TODO: Horrid. A metric change invalidates all parameters.
+           ui_->line_edit_background->text() != cached_background)
       {
         image<vector3<std::uint8_t>> image;
         image.load(ui_->line_edit_background->text().toStdString());
@@ -286,25 +292,26 @@ void window::create_client (const std::string& address)
         request.mutable_background_image()->set_data(static_cast<void*>(image.data.data()), image.data.size() * sizeof(vector3<std::uint8_t>));
         request.mutable_background_image()->mutable_size()->set_x(image.size[0]);
         request.mutable_background_image()->mutable_size()->set_y(image.size[1]);
+
+        cached_background = ui_->line_edit_background->text();
       }
+      else
+        request.clear_background_image();
+      
+      client_->request_cv().notify_all();
     });
     connect(client_.get(), &client::on_receive_response, this, [&]
     {
       if (client_)
       {
         statusBar()->showMessage("Received image from the server.");
-
         const auto& image = client_->response_data();
-        
         ui_->image->setPixmap(QPixmap::fromImage(QImage(
           reinterpret_cast<const unsigned char*>(image.data().c_str()),
           image.size().x(),
           image.size().y(),
-          QImage::Format_RGB888))); 
-          
-        // TODO: QImage bugs out for certain x, y. Power of two problem? + Interaction.
+          QImage::Format_RGB888))); // TODO: QImage bugs out for certain x, y.
       }
-
       if(!ui_->checkbox_autorender->isChecked())
         ui_->button_render->setEnabled(true);
     });

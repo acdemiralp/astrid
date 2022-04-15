@@ -114,7 +114,7 @@ void server::update(const request& request)
       if (transform.has_rotation_euler())
       {
         auto& rotation = transform.rotation_euler();
-        ray_tracer.observer.transform.rotation_from_euler({rotation.x(), rotation.y(), rotation.z()});
+        ray_tracer.observer.transform.rotation_from_euler({to_radians(rotation.x()), to_radians(rotation.y()), to_radians(rotation.z())});
       }
 
       if (transform.has_look_at_origin() && transform.look_at_origin())

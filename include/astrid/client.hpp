@@ -1,8 +1,10 @@
 #pragma once
 
 #include <atomic>
+#include <condition_variable>
 #include <cstdint>
 #include <future>
+#include <mutex>
 #include <string>
 
 #include <QObject>
@@ -42,6 +44,10 @@ public:
   {
     return request_data_;
   }
+  std::condition_variable& request_cv()
+  {
+    return request_cv_;
+  }
   const image& response_data      () const
   {
     return response_data_;
@@ -53,16 +59,18 @@ signals:
   void         on_finalize        ();
   
 protected:
-  zmq::context_t    context_      {1};
-  zmq::socket_t     socket_       {context_, ZMQ_PAIR};
-  std::string       address_      ;
-  
-  std::future<void> future_       ;
-  std::atomic_bool  alive_        {true};
-
-  std::atomic_bool  request_once_ ;
-  std::atomic_bool  request_auto_ ;
-  ::request         request_data_ ;
-  ::image           response_data_;
+  zmq::context_t          context_      {1};
+  zmq::socket_t           socket_       {context_, ZMQ_PAIR};
+  std::string             address_      ;
+                          
+  std::future<void>       future_       ;
+  std::atomic_bool        alive_        {true};
+                          
+  std::atomic_bool        request_once_ ;
+  std::atomic_bool        request_auto_ ;
+  ::request               request_data_ ;
+  ::image                 response_data_;
+  std::mutex              request_mutex_;
+  std::condition_variable request_cv_   ;
 };
 }

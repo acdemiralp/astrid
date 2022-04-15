@@ -17,7 +17,40 @@ view::view(QWidget* parent) : QLabel(parent), window_(dynamic_cast<ast::window*>
     to_radians(window_->ui()->line_edit_rotation_x->text().toFloat()),
     to_radians(window_->ui()->line_edit_rotation_y->text().toFloat()),
     to_radians(window_->ui()->line_edit_rotation_z->text().toFloat())});
-  // TODO: Subscribe to line edit callbacks to keep in sync.
+
+  connect(window_->ui()->line_edit_position_x, &QLineEdit::editingFinished, this, [&] 
+  {
+    transform_.translation[0] = window_->ui()->line_edit_position_x->text().toFloat();
+  });
+  connect(window_->ui()->line_edit_position_y, &QLineEdit::editingFinished, this, [&] 
+  {
+    transform_.translation[1] = window_->ui()->line_edit_position_y->text().toFloat();
+  });
+  connect(window_->ui()->line_edit_position_z, &QLineEdit::editingFinished, this, [&] 
+  {
+    transform_.translation[2] = window_->ui()->line_edit_position_z->text().toFloat();
+  });
+  connect(window_->ui()->line_edit_rotation_x, &QLineEdit::editingFinished, this, [&] 
+  {
+    transform_.rotation_from_euler({
+      to_radians(window_->ui()->line_edit_rotation_x->text().toFloat()),
+      to_radians(window_->ui()->line_edit_rotation_y->text().toFloat()),
+      to_radians(window_->ui()->line_edit_rotation_z->text().toFloat())});
+  });
+  connect(window_->ui()->line_edit_rotation_y, &QLineEdit::editingFinished, this, [&] 
+  {
+    transform_.rotation_from_euler({
+      to_radians(window_->ui()->line_edit_rotation_x->text().toFloat()),
+      to_radians(window_->ui()->line_edit_rotation_y->text().toFloat()),
+      to_radians(window_->ui()->line_edit_rotation_z->text().toFloat())});
+  });
+  connect(window_->ui()->line_edit_rotation_z, &QLineEdit::editingFinished, this, [&] 
+  {
+    transform_.rotation_from_euler({
+      to_radians(window_->ui()->line_edit_rotation_x->text().toFloat()),
+      to_radians(window_->ui()->line_edit_rotation_y->text().toFloat()),
+      to_radians(window_->ui()->line_edit_rotation_z->text().toFloat())});
+  });
 
   connect(timer_.get(), &QTimer::timeout, this, [&]
   {
@@ -27,16 +60,20 @@ view::view(QWidget* parent) : QLabel(parent), window_(dynamic_cast<ast::window*>
       window_->ui()->line_edit_position_z->text().toFloat()
     };
 
-    if (key_map_[Qt::Key_D]) position += transform_.right  () * move_speed_;
-    if (key_map_[Qt::Key_A]) position -= transform_.right  () * move_speed_;
-    if (key_map_[Qt::Key_E]) position += transform_.up     () * move_speed_;
-    if (key_map_[Qt::Key_Q]) position -= transform_.up     () * move_speed_;
-    if (key_map_[Qt::Key_W]) position += transform_.forward() * move_speed_;
-    if (key_map_[Qt::Key_S]) position -= transform_.forward() * move_speed_;
+    bool moving = false;
+    if (key_map_[Qt::Key_D]) { moving = true; position += transform_.right  () * move_speed_; }
+    if (key_map_[Qt::Key_A]) { moving = true; position -= transform_.right  () * move_speed_; }
+    if (key_map_[Qt::Key_E]) { moving = true; position += transform_.up     () * move_speed_; }
+    if (key_map_[Qt::Key_Q]) { moving = true; position -= transform_.up     () * move_speed_; }
+    if (key_map_[Qt::Key_W]) { moving = true; position += transform_.forward() * move_speed_; }
+    if (key_map_[Qt::Key_S]) { moving = true; position -= transform_.forward() * move_speed_; }
     
-    window_->ui()->line_edit_position_x->setText(QString::number(position[0]));
-    window_->ui()->line_edit_position_y->setText(QString::number(position[1]));
-    window_->ui()->line_edit_position_z->setText(QString::number(position[2]));
+    if (moving)
+    {
+      window_->ui()->line_edit_position_x->setText(QString::number(position[0]));
+      window_->ui()->line_edit_position_y->setText(QString::number(position[1]));
+      window_->ui()->line_edit_position_z->setText(QString::number(position[2]));
+    }
   });
   timer_->start(16);
 }

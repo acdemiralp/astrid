@@ -629,21 +629,21 @@
                 <item>
                  <widget class="QLineEdit" name="line_edit_position_x">
                   <property name="text">
-                   <string>10.0</string>
+                   <string>0.1</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLineEdit" name="line_edit_position_y">
                   <property name="text">
-                   <string>0.0</string>
+                   <string>0.1</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLineEdit" name="line_edit_position_z">
                   <property name="text">
-                   <string>0.0</string>
+                   <string>-5.0</string>
                   </property>
                  </widget>
                 </item>
@@ -667,7 +667,7 @@
                    <bool>false</bool>
                   </property>
                   <property name="text">
-                   <string>-90.0</string>
+                   <string>0.0</string>
                   </property>
                  </widget>
                 </item>

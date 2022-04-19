@@ -84,9 +84,42 @@
               </item>
               <item row="0" column="1">
                <widget class="QComboBox" name="combobox_metric">
+                <property name="currentIndex">
+                 <number>16</number>
+                </property>
                 <item>
                  <property name="text">
-                  <string>minkowski</string>
+                  <string>alcubierre</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>barriola_vilenkin</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>bertotti_kasner</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>bessel</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>de_sitter</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>einstein_rosen_weber_wheeler_bonnor</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>friedman_lemaitre_robertson_walker</string>
                  </property>
                 </item>
                 <item>
@@ -96,7 +129,12 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>schwarzschild</string>
+                  <string>janis_newman_winicour</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>kastor_traschen</string>
                  </property>
                 </item>
                 <item>
@@ -106,7 +144,37 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>kastor_traschen</string>
+                  <string>kottler</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>minkowski</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>morris_thorne</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>reissner_nordstroem</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>reissner_nordstroem_extreme_dihole</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>schwarzschild</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>schwarzschild_cosmic_string</string>
                  </property>
                 </item>
                </widget>
@@ -561,21 +629,21 @@
                 <item>
                  <widget class="QLineEdit" name="line_edit_position_x">
                   <property name="text">
-                   <string>0.1</string>
+                   <string>10.0</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLineEdit" name="line_edit_position_y">
                   <property name="text">
-                   <string>0.1</string>
+                   <string>0.0</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLineEdit" name="line_edit_position_z">
                   <property name="text">
-                   <string>-10.0</string>
+                   <string>0.0</string>
                   </property>
                  </widget>
                 </item>
@@ -599,7 +667,7 @@
                    <bool>false</bool>
                   </property>
                   <property name="text">
-                   <string>0.0</string>
+                   <string>-90.0</string>
                   </property>
                  </widget>
                 </item>
@@ -620,7 +688,7 @@
                 <item>
                  <widget class="QLineEdit" name="line_edit_fov_y">
                   <property name="text">
-                   <string>75.0</string>
+                   <string>120.0</string>
                   </property>
                  </widget>
                 </item>

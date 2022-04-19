@@ -61,16 +61,42 @@ void server::update(const proto::request& request)
 {
   if (request.has_metric())
   {
-    if      (request.metric() == "minkowski")
-      ray_tracer_.emplace<ray_tracer<metrics::minkowski      <scalar_type>, motion_type>>();
+    if      (request.metric() == "alcubierre")
+      ray_tracer_.emplace<ray_tracer<metrics::alcubierre                          <scalar_type>, motion_type>>();
+    else if (request.metric() == "barriola_vilenkin")
+      ray_tracer_.emplace<ray_tracer<metrics::barriola_vilenkin                   <scalar_type>, motion_type>>();
+    else if (request.metric() == "bertotti_kasner")
+      ray_tracer_.emplace<ray_tracer<metrics::bertotti_kasner                     <scalar_type>, motion_type>>();
+    else if (request.metric() == "bessel")
+      ray_tracer_.emplace<ray_tracer<metrics::bessel                              <scalar_type>, motion_type>>();
+    else if (request.metric() == "de_sitter")
+      ray_tracer_.emplace<ray_tracer<metrics::de_sitter                           <scalar_type>, motion_type>>();
+    else if (request.metric() == "einstein_rosen_weber_wheeler_bonnor")
+      ray_tracer_.emplace<ray_tracer<metrics::einstein_rosen_weber_wheeler_bonnor <scalar_type>, motion_type>>();
+    else if (request.metric() == "friedman_lemaitre_robertson_walker")
+      ray_tracer_.emplace<ray_tracer<metrics::friedman_lemaitre_robertson_walker  <scalar_type>, motion_type>>();
     else if (request.metric() == "goedel")
-      ray_tracer_.emplace<ray_tracer<metrics::goedel         <scalar_type>, motion_type>>();
-    else if (request.metric() == "schwarzschild")
-      ray_tracer_.emplace<ray_tracer<metrics::schwarzschild  <scalar_type>, motion_type>>();
-    else if (request.metric() == "kerr")
-      ray_tracer_.emplace<ray_tracer<metrics::kerr           <scalar_type>, motion_type>>();
+      ray_tracer_.emplace<ray_tracer<metrics::goedel                              <scalar_type>, motion_type>>();
+    else if (request.metric() == "janis_newman_winicour")
+      ray_tracer_.emplace<ray_tracer<metrics::janis_newman_winicour               <scalar_type>, motion_type>>();
     else if (request.metric() == "kastor_traschen")
-      ray_tracer_.emplace<ray_tracer<metrics::kastor_traschen<scalar_type>, motion_type>>();
+      ray_tracer_.emplace<ray_tracer<metrics::kastor_traschen                     <scalar_type>, motion_type>>();
+    else if (request.metric() == "kerr")
+      ray_tracer_.emplace<ray_tracer<metrics::kerr                                <scalar_type>, motion_type>>();
+    else if (request.metric() == "kottler")
+      ray_tracer_.emplace<ray_tracer<metrics::kottler                             <scalar_type>, motion_type>>();
+    else if (request.metric() == "minkowski")
+      ray_tracer_.emplace<ray_tracer<metrics::minkowski                           <scalar_type>, motion_type>>();
+    else if (request.metric() == "morris_thorne")
+      ray_tracer_.emplace<ray_tracer<metrics::morris_thorne                       <scalar_type>, motion_type>>();
+    else if (request.metric() == "reissner_nordstroem")
+      ray_tracer_.emplace<ray_tracer<metrics::reissner_nordstroem                 <scalar_type>, motion_type>>();
+    else if (request.metric() == "reissner_nordstroem_extreme_dihole")
+      ray_tracer_.emplace<ray_tracer<metrics::reissner_nordstroem_extreme_dihole  <scalar_type>, motion_type>>();
+    else if (request.metric() == "schwarzschild")
+      ray_tracer_.emplace<ray_tracer<metrics::schwarzschild                       <scalar_type>, motion_type>>();
+    else if (request.metric() == "schwarzschild_cosmic_string")
+      ray_tracer_.emplace<ray_tracer<metrics::schwarzschild_cosmic_string         <scalar_type>, motion_type>>();
   }
 
   std::visit([&] (auto& ray_tracer)

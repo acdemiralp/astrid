@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <variant>
 
 #include <astray/api.hpp>
@@ -53,10 +54,10 @@ public:
 protected:
   void update(const proto::request& request);
 
-  mpi::environment  environment_ ;
-  mpi::communicator communicator_;
-  zmq::context_t    context_     {1};
-  zmq::socket_t     socket_      {context_, ZMQ_PAIR};
-  ray_tracer_type   ray_tracer_  ;
+  mpi::environment               environment_ ;
+  mpi::communicator              communicator_;
+  zmq::context_t                 context_     {1};
+  zmq::socket_t                  socket_      {context_, ZMQ_PAIR};
+  std::optional<ray_tracer_type> ray_tracer_  ;
 };
 }

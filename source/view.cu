@@ -118,7 +118,7 @@ void view::mouseMoveEvent   (QMouseEvent* event)
   {
     const auto dx = event->x() - last_mouse_position_.x();
     const auto dy = event->y() - last_mouse_position_.y();
-    transform_.rotation = transform_.rotation * ast::angle_axis<float>(to_radians(look_speed_ * dx), transform<float>::vector_type::UnitY());
+    transform_.rotation = transform_.rotation * ast::angle_axis<float>(to_radians(look_speed_ * dx), vector3<float>::UnitY());
     transform_.rotation = transform_.rotation * ast::angle_axis<float>(to_radians(look_speed_ * dy), transform_.right());
     
     auto euler = transform_.rotation_to_euler();

@@ -263,7 +263,7 @@ void window::create_client    (const std::string& address)
     statusBar()->showMessage("Connected to " + QString::fromStdString(address) + ".");
     set_ui_state(true);
   }
-  catch (const std::runtime_error& error)
+  catch (const std::runtime_error&)
   {
     statusBar()->showMessage("Failed to connect " + QString::fromStdString(address) + ".");
   }

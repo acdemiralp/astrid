@@ -33,7 +33,7 @@ protected:
   std::unordered_map<Qt::Key, bool> key_map_            ;
   transform<float>                  transform_          ;
 
-  float                             move_speed_         = 0.001f;
+  float                             move_speed_         = 0.01f;
   float                             look_speed_         = 0.1f ;
   QPoint                            last_mouse_position_;
 };
